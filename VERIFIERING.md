@@ -1,22 +1,34 @@
-# Cosmos Explorer 0.2 – verifiering 2026-11-01
+# Cosmos Explorer 0.2 – kamerastyrning, 2026-11-01
 
-## Resultat
+## Diagnos och baslinje
 
-- 26 Vitest-tester: koordinater, dataintegritet, import, flyginmatning, sidindelning, sökning och återställning.
-- TypeScript-kontroll och Vite-produktionsbygge lyckas.
-- Två Playwright-tester i installerad Google Chrome: kamerafärd och fortsatt stabil position, rymdskeppsresa, pekknappar, alla katalogsidor, återställning och mobil bredd.
-- Chrome renderade WebGL med SwiftShader. Skärmbilder av dator- och mobilvyn granskade.
-- npm-installationen rapporterade 0 kända sårbarheter.
+De två befintliga Chrome-testerna passerade före omarbetningen. Den tidigare telemetriåterställningen reproducerades inte i den redan rättade versionen. Fixen med stabil kamerakonfiguration och memoiserad 3D-vy behålls.
 
-## Kamerafix
+Kodgranskningen visade kvarvarande svagheter: OrbitControls och resan hade varsin uppdatering av kameran, den exponentiella animationen saknade mjuk acceleration, och en separat lägeseffekt avbröt resor. Kamera och target använde däremot redan samma koordinatsystem.
 
-Tidigare skapades kamerans startkonfiguration på nytt när UI uppdaterades med telemetri. Nu används en stabil konfiguration och en memoiserad 3D-vy. Webbläsartestet mäter ett initialt avstånd över 20 ljusår till Proxima, väntar på ankomst under 7 ljusår och kontrollerar att kameran förblir på cirka 6,17 ljusårs avstånd genom flera telemetriuppdateringar. Resor stannar med offset (3,2,5) ljusår från målet för att hålla stjärnmarkören synlig.
+## Lösning
 
-## Avgränsningar
+Navigation samordnar en aktiv ägare: resa, rymdskepp eller OrbitControls. Resan beräknas i renderingsvärldens ljusår, stannar 3 ljusår från målet och riktar kameran mot det. Smootherstep ger noll hastighet och acceleration vid start och slut; quaternion-slerp ger mjuk orientering. Orbit-inerti töms vid överlämning och aktuell kamerariktning bevaras, inklusive efter avbrott. Lägesbyte låter resan fortsätta. Knapp, Escape och manuell navigation kan avbryta.
 
-Codex inbyggda webbläsarverktyg blockeras fortfarande av miljöns symboliska Documents-länk. Testerna kördes därför med Playwright i lokal Chrome. Fysisk mobil, Safari, hårdvaruaccelererad GPU och samtliga pekgester är inte verifierade. En 390 × 844 mobilvy testades utan horisontellt överflöde.
+## Tester
 
-Vite varnar fortsatt för en JavaScript-fil på cirka 1,2 MB (338 kB gzip). Katalogen består av 150 verkliga Gaia DR3-källor plus solen som approximativt origo. Stjärnpositioner är statiska vid J2016.0; relativitet och gravitation ingår inte. Fullständig dataproveniens finns i README.
+Slutresultat: **36 av 36 enhetstester och 3 av 3 Chrome-scenarier passerar**. Den isolerade webbläsarkörningen tog 47,9 sekunder. TypeScript-kontroll och produktionsbygge passerar. Skärmbilden vid ankomst visar Proxima centrerad och ett avstånd på 3,00 ljusår.
+
+36 enhetstester i två filer omfattar koordinater, katalogintegritet, flygning, slutposition, orientering, polriktningar, sammanfallande kamera/mål, avbrott, byte av destination mitt i resan, upprepade resor och resor mellan andra stjärnor än solen.
+
+Tre Playwright-scenarier omfattar:
+
+1. Faktisk kameraförflyttning, stabil ankomst efter telemetriuppdateringar, rymdskeppsresa och flygknappar.
+2. Katalogsidor, återställning och mobil bredd.
+3. Lägesbyte under resa, avbrytknapp, frusen position och orientering efter avbrott, lägesbyte utan hopp, resa Proxima–Barnards stjärna, exakt slutavstånd och blickriktning, upprepad destination samt Escape.
+
+TypeScript-kontroll och Vite-produktionsbygge lyckas. Gaia-katalog och original-CSV är oförändrade.
+
+## Praktiska begränsningar
+
+Chrome använder SwiftShader (mjukvarurendering), vilket kan ge låg bildfrekvens. Första körningen av den utökade resan nådde 74 % innan den gamla tidsgränsen på 12 sekunder löpte ut. Väntetiden ändrades till 30 sekunder. Resans animationssteg är begränsat till 0,05 sekunder för att undvika stora hopp; dold flik pausar resan och låg bildfrekvens förlänger restiden.
+
+Fysisk mobil, Safari och hårdvaruaccelererad GPU är inte testade. Ingen fysisk kollisionsmodell eller ruttplanering runt andra stjärnmarkörer ingår; målstjärnans ankomstradie respekteras. Manuell flygning är fri. Vite varnar för cirka 1,2 MB JavaScript (339 kB gzip).
 
 ## Reproducera
 
@@ -27,4 +39,6 @@ npm run build
 npm run test:e2e
 ```
 
-Webbläsartesterna kräver installerad Google Chrome och använder port 5174. `npm run dev` startar appen för vanlig användning.
+Webbläsartesterna kräver Google Chrome och använder port 5175 med filbevakning avstängd.
+
+En separat körning stördes av Vites automatiska omladdningar, bekräftade i serverloggen och genom återställd sökning i felrapporten. Slutkörningen använder därför en isolerad testserver utan filbevakning; den vanliga förhandsvisningen behåller hot reload.

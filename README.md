@@ -91,4 +91,16 @@ Ingen relativitet, stjärnutveckling, planetsystem, egenrörelse eller beständi
 - Kamerans startinställningar är stabila och 3D-vyn renderas inte om för varje telemetriuppdatering. Kamerafärder återställs därför inte av positionspanelen.
 - Flygknappar använder separata inmatningskällor för varje finger och tangent. Pekavbrott, förlorat fokus och dold flik tömmer inmatningen. WASD fungerar även efter att en knapp fått fokus.
 - Katalogen har sidindelning om 50 objekt, sortering efter namn eller avstånd och återställning av Gaia-katalogen efter import.
-- `npm run test:e2e` kör Chrome-tester för kamerafärd, flygknappar, katalogsidor och mobil bredd. Installerad Google Chrome krävs. Testservern använder port 5174.
+- `npm run test:e2e` kör Chrome-tester för kamerafärd, flygknappar, katalogsidor och mobil bredd. Installerad Google Chrome krävs. Testservern använder port 5175 med filbevakning avstängd.
+
+## Kamerastyrning och resor
+
+Den ursprungliga återställningen orsakades av att kamerans startposition skickades in på nytt vid telemetriuppdateringar. Den tidigare fixen med stabil kamerakonfiguration och memoiserad 3D-vy behålls. Baslinjens två Chrome-tester passerade inför denna omarbetning: det gamla felet reproducerades alltså inte i den redan rättade versionen.
+
+Granskningen visade återstående problem: Drei OrbitControls hade en egen uppdateringsloop samtidigt som reseanimationen flyttade kameran, exponentiell interpolation saknade mjuk acceleration, och en lägeseffekt avbröt pågående resor. Nu samordnar `Navigation` tre exklusiva tillstånd: resa, manuell flygning eller OrbitControls. Under resa är OrbitControls avstängd och uppdateras inte. När kontrollen lämnas tillbaka töms tidigare rotationsinerti och kamerans aktuella orientering bevaras, även efter avbrott.
+
+`CameraJourney` tar en kopia av startposition och startorientering, beräknar ett mål 3 ljusår från stjärnan längs inflygningsriktningen och använder en femtegradskurva (smootherstep) med noll hastighet och acceleration vid ändpunkterna. Orientering interpoleras med quaternion-slerp. Alla vektorer använder samma renderingskoordinater (X,Z,−Y), i ljusår. Resans nominella längd är 1,2–4,5 sekunder. Tidssteg begränsas till 0,05 sekunder; dold flik pausar och låg bildfrekvens kan förlänga restiden.
+
+**Avbryt** med knappen, Escape eller manuell navigation. Lägesbyte under resa låter resan fortsätta; efter ankomst används det nya läget. Ny destination under pågående resa startar från den aktuella kameran. Upprepade resor till samma stjärna ger samma slutposition. Resan stannar utanför målstjärnans symboliska markör; start inuti ankomstradien ger en utåtriktad förflyttning. Polriktningar och sammanfallande kamera/mål hanteras särskilt.
+
+Detta är visuell navigation. Det finns ingen fysisk kollisionsmodell eller ruttplanering runt andra stjärnmarkörer, och manuell flygning är fri. Kamerans rullning kan bevaras vid avbrott för att undvika en plötslig horisontändring. Astronomiska katalogdata är oförändrade.
