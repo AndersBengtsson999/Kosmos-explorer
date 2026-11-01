@@ -1,0 +1,5 @@
+import {create} from 'zustand';
+import {catalog,sun,type Star} from './data/catalog';
+import type {Vec3} from './math/coordinates';
+interface State {stars:Star[];selected:string;mode:'map'|'ship';speed:number;position:Vec3;moving:boolean;travel:{id:string;nonce:number};select:(id:string)=>void;go:(id:string)=>void;setMode:(mode:'map'|'ship')=>void;setSpeed:(speed:number)=>void;telemetry:(position:Vec3,moving:boolean)=>void;importStars:(stars:Star[])=>void}
+export const useStore=create<State>((set)=>({stars:catalog,selected:'sun',mode:'map',speed:2,position:[24,16,30],moving:false,travel:{id:'sun',nonce:0},select:selected=>set({selected}),go:id=>set(s=>({selected:id,travel:{id,nonce:s.travel.nonce+1}})),setMode:mode=>set({mode}),setSpeed:speed=>set({speed}),telemetry:(position,moving)=>set({position,moving}),importStars:stars=>set(s=>({stars:[sun,...stars],selected:'sun',travel:{id:'sun',nonce:s.travel.nonce+1}}))}));
