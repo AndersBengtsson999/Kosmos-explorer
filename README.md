@@ -1,4 +1,4 @@
-# Cosmos Explorer 0.1
+# Cosmos Explorer 0.2
 
 Körbar, lokal 3D-stjärnkarta med React, TypeScript, Vite, Three.js / React Three Fiber, Zustand och Vitest. Svenskt responsivt gränssnitt. Kräver Node.js 22.12+ och en modern webbläsare med WebGL.
 
@@ -16,7 +16,7 @@ npm run dev
 - Kartläge: dra för rotation, skrolla/nyp för zoom, högerdra/två fingrar för panorering.
 - Klicka på stjärna eller sökresultat för information. Dubbelklicka eller tryck **Res till stjärnan** för mjuk kamerafärd. **Till solen** återgår till origo.
 - Sök efter namn eller komplett Gaia-ID. De flesta källorna har katalogbeteckningar, inte vardagsnamn.
-- Rymdskepp: WASD framåt/bakåt/sidledes, Q/E ned/upp. Dra med mus eller finger för att titta. Reglera hastighet med reglaget. Pekknappar ger framåt/bakåt/sidledes på mobil.
+- Rymdskepp: WASD framåt/bakåt/sidledes, Q/E ned/upp. Dra med mus eller finger för att titta. Reglera hastighet med reglaget. Pekknappar ger framåt/bakåt/sidledes och höjdled på mobil.
 - Flygningen är en förenklad kameraoperation i ljusår per verklig sekund; ingen relativitet, acceleration, gravitation eller kollisionsmodell. Kamerafärder till mål har ingen fysisk restid.
 - Informationspanelen visar avstånd från solen och kameran, RA, deklination, parallax med mätosäkerhet, G-magnitud och epok. Kamerakoordinater visas längst ned.
 
@@ -82,6 +82,13 @@ RA/dec i grader, parallax och parallaxError i mas. `mag`, `bpRp` och `parallaxEr
 - `src/ui`: responsiva paneler, sökning, import och kontroller.
 - `src/core.test.ts`: koordinater, dataintegritet, ogiltiga importer, flygning och tillståndsövergångar.
 
-## Begränsningar i 0.1
+## Begränsningar
 
-Ingen relativitet, stjärnutveckling, planetsystem, egenrörelse eller beständig lagring. Katalogen är ett urval. Mätosäkerheter visas men visualiseras inte som volymer. Hastighetsreglaget anger manuell flyghastighet; destinationsfärder använder separat kamerainterpolering. Vid mycket stora importer används en mesh per stjärna och prestandan kan minska. WebGL-fel ger ett meddelande medan katalogpanelen förblir tillgänglig. Mobil styrs med pekdrag och riktningsknappar; tangentbord ger även höjdled.
+Ingen relativitet, stjärnutveckling, planetsystem, egenrörelse eller beständig lagring. Katalogen är ett urval. Mätosäkerheter visas men visualiseras inte som volymer. Hastighetsreglaget anger manuell flyghastighet; destinationsfärder använder separat kamerainterpolering. Vid mycket stora importer används en mesh per stjärna och prestandan kan minska. WebGL-fel ger ett meddelande medan katalogpanelen förblir tillgänglig. Mobil styrs med pekdrag och sex riktningsknappar.
+
+## Nytt i 0.2
+
+- Kamerans startinställningar är stabila och 3D-vyn renderas inte om för varje telemetriuppdatering. Kamerafärder återställs därför inte av positionspanelen.
+- Flygknappar använder separata inmatningskällor för varje finger och tangent. Pekavbrott, förlorat fokus och dold flik tömmer inmatningen. WASD fungerar även efter att en knapp fått fokus.
+- Katalogen har sidindelning om 50 objekt, sortering efter namn eller avstånd och återställning av Gaia-katalogen efter import.
+- `npm run test:e2e` kör Chrome-tester för kamerafärd, flygknappar, katalogsidor och mobil bredd. Installerad Google Chrome krävs. Testservern använder port 5174.

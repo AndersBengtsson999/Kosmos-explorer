@@ -27,3 +27,16 @@ describe('navigation state',()=>{
  it('allows repeated trips to the same destination',()=>{useStore.getState().go(catalog[1].id);useStore.getState().go(catalog[1].id);expect(useStore.getState().travel.nonce).toBe(2);});
  it('resets selection and destination after replacing a catalog',()=>{useStore.getState().go(catalog[1].id);useStore.getState().importStars(parseCatalog([raw[2]]));expect(useStore.getState().selected).toBe('sun');expect(useStore.getState().stars).toHaveLength(2);});
 });
+
+import {FlightInput} from './navigation/flightInput';
+import {searchStars,PAGE_SIZE} from './data/search';
+describe('independent flight controls',()=>{
+ it('releasing a pointer preserves a held keyboard key',()=>{const input=new FlightInput();input.press('keyboard:KeyW','KeyW');input.press('pointer:1','KeyW');input.release('pointer:1');expect(input.keys().has('KeyW')).toBe(true);});
+ it('supports multiple fingers and clears on interruption',()=>{const input=new FlightInput();input.press('pointer:1','KeyW');input.press('pointer:2','KeyE');expect(input.keys().size).toBe(2);input.clear();expect(input.keys().size).toBe(0);});
+});
+describe('catalog browsing',()=>{
+ it('makes every star reachable across pages',()=>{const results=searchStars(catalog,'','distance');const ids=[];for(let i=0;i<results.length;i+=PAGE_SIZE)ids.push(...results.slice(i,i+PAGE_SIZE).map(s=>s.id));expect(new Set(ids).size).toBe(151);});
+ it('trims queries and searches names and IDs',()=>{expect(searchStars(catalog,' proxima ','name')[0].name).toBe('Proxima Centauri');expect(searchStars(catalog,raw[0].id,'name')).toHaveLength(1);});
+ it('sorts by distance without mutating the original',()=>{const input=[catalog[2],catalog[0],catalog[1]];expect(searchStars(input,'','distance')[0].id).toBe('sun');expect(input[0].id).toBe(catalog[2].id);});
+ it('restores the bundled catalog after import',()=>{useStore.getState().importStars(parseCatalog([raw[0]]));useStore.getState().resetCatalog();expect(useStore.getState().stars).toHaveLength(151);expect(useStore.getState().selected).toBe('sun');});
+});
