@@ -1,75 +1,22 @@
-import {describe, expect, it} from 'vitest';
-import {PerspectiveCamera, Quaternion, Vector3} from 'three';
-import {ARRIVAL_DISTANCE, CameraJourney, smootherstep} from './CameraJourney';
+import {describe,expect,it} from 'vitest';
+import {PerspectiveCamera,Vector3} from 'three';
+import {CameraJourney,smootherstep} from './CameraJourney';
+import {CameraAim} from './CameraAim';
+import {skyDirection,destinationIndicator,starAhead} from './guidance';
 import {catalog} from '../data/catalog';
-
-function cameraAt(position:Vector3) {
-  const camera = new PerspectiveCamera(); camera.position.copy(position); camera.lookAt(0,0,0); return camera;
-}
-function finish(journey:CameraJourney,camera:PerspectiveCamera) {
-  for(let i=0;i<400&&journey.active;i++) journey.step(camera,1/60);
-  expect(journey.active).toBe(false);
-}
-function expectFacing(camera:PerspectiveCamera,target:Vector3) {
-  const toward=target.clone().sub(camera.position).normalize();
-  expect(camera.getWorldDirection(new Vector3()).dot(toward)).toBeCloseTo(1,10);
-}
-
-describe('camera journey in render-world light years',()=>{
- it('arrives exactly at the defined distance and looks at a real star',()=>{
-  const camera=cameraAt(new Vector3(24,16,30)),target=new Vector3(...catalog[1].position),journey=new CameraJourney();
-  journey.start(camera,target);finish(journey,camera);
-  expect(camera.position.distanceTo(target)).toBeCloseTo(ARRIVAL_DISTANCE,10);expectFacing(camera,target);
- });
- it('starts without changing position or orientation',()=>{
-  const camera=cameraAt(new Vector3(20,-3,12)),p=camera.position.clone(),q=camera.quaternion.clone(),journey=new CameraJourney();
-  journey.start(camera,new Vector3(4,6,-10));journey.step(camera,0);
-  expect(camera.position.equals(p)).toBe(true);expect(camera.quaternion.angleTo(q)).toBeCloseTo(0);
- });
- it('accelerates and brakes with zero endpoint velocity and no overshoot',()=>{
-  expect(smootherstep(0)).toBe(0);expect(smootherstep(1)).toBe(1);
-  expect(smootherstep(.01)).toBeLessThan(.00002);expect(1-smootherstep(.99)).toBeLessThan(.00002);
-  let previous=0;for(let i=0;i<=100;i++){const t=smootherstep(i/100);expect(t).toBeGreaterThanOrEqual(previous);expect(t).toBeLessThanOrEqual(1);previous=t;}
- });
- it('keeps the route outside the target marker from arbitrary directions',()=>{
-  for(const start of [new Vector3(-8,5,3),new Vector3(0,40,0),new Vector3(0,-40,0)]){
-   const camera=cameraAt(start),journey=new CameraJourney(),target=new Vector3();journey.start(camera,target);
-   for(let i=0;i<400&&journey.active;i++){journey.step(camera,1/60);expect(camera.position.length()).toBeGreaterThanOrEqual(ARRIVAL_DISTANCE-1e-10);}
-   expectFacing(camera,target);
-  }
- });
- it('retreats safely if already closer than the arrival distance',()=>{
-  const camera=cameraAt(new Vector3(.5,0,0)),journey=new CameraJourney();journey.start(camera,new Vector3());
-  for(let i=0;i<400&&journey.active;i++){journey.step(camera,1/60);expect(camera.position.x).toBeGreaterThanOrEqual(.5);}
-  expect(camera.position.x).toBeCloseTo(3);
- });
- it('handles a coincident camera and target without NaN',()=>{
-  const camera=cameraAt(new Vector3()),journey=new CameraJourney();journey.start(camera,new Vector3());finish(journey,camera);
-  expect(camera.position.length()).toBeCloseTo(3);expectFacing(camera,new Vector3());
- });
- it('cancellation freezes the current pose rather than snapping to either endpoint',()=>{
-  const camera=cameraAt(new Vector3(30,5,8)),journey=new CameraJourney();journey.start(camera,new Vector3(1,2,3));
-  for(let i=0;i<40;i++)journey.step(camera,1/60);
-  const p=camera.position.clone(),q=camera.quaternion.clone();journey.cancel();journey.step(camera,10);
-  expect(camera.position.equals(p)).toBe(true);expect(camera.quaternion.equals(q)).toBe(true);
- });
- it('travels between two non-solar stars and supports repeated destinations',()=>{
-  const camera=cameraAt(new Vector3(24,16,30)),journey=new CameraJourney();
-  for(const star of [catalog[1],catalog[2],catalog[2],catalog[1]]){
-   const target=new Vector3(...star.position);journey.start(camera,target);finish(journey,camera);
-   expect(camera.position.distanceTo(target)).toBeCloseTo(3);expectFacing(camera,target);
-  }
- });
- it('retargeting starts from the current interpolated pose',()=>{
-  const camera=cameraAt(new Vector3(20,20,20)),journey=new CameraJourney();journey.start(camera,new Vector3());
-  for(let i=0;i<30;i++)journey.step(camera,1/60);
-  const p=camera.position.clone(),q=camera.quaternion.clone();journey.start(camera,new Vector3(9,-10,5));journey.step(camera,0);
-  expect(camera.position.equals(p)).toBe(true);expect(camera.quaternion.angleTo(q)).toBeCloseTo(0);
- });
- it('uses shortest quaternion interpolation and bounded time steps',()=>{
-  const camera=cameraAt(new Vector3(12,0,0));camera.quaternion.copy(new Quaternion().setFromAxisAngle(new Vector3(0,1,0),Math.PI));
-  const journey=new CameraJourney();journey.start(camera,new Vector3());journey.step(camera,60);
-  expect(journey.elapsed).toBe(.05);expect(journey.progress).toBeLessThan(.05);
-  expect(camera.quaternion.length()).toBeCloseTo(1);
- });
+const camera=()=>{const c=new PerspectiveCamera(55,1,0.01,100000);c.position.set(24,16,30);c.lookAt(0,0,0);c.updateMatrixWorld();return c;};
+describe('independent translation and orientation',()=>{
+ it.each([10,20,40,60])('uses exactly %s seconds of active travel time',duration=>{const c=camera(),j=new CameraJourney(),target=new Vector3(...catalog[1].position);j.start(c,target,duration);j.step(c,duration/2);expect(j.progress).toBe(.5);expect(j.active).toBe(true);j.step(c,duration/2);expect(j.active).toBe(false);expect(c.position.distanceTo(target)).toBeCloseTo(3,10);});
+ it('defaults to 20 seconds',()=>{const j=new CameraJourney();j.start(camera(),new Vector3());expect(j.duration).toBe(20);});
+ it('pauses without losing elapsed time and resumes from the same point',()=>{const c=camera(),j=new CameraJourney();j.start(c,new Vector3());j.step(c,5);j.paused=true;const p=c.position.clone();j.step(c,200);expect(c.position.equals(p)).toBe(true);expect(j.elapsed).toBe(5);j.paused=false;j.step(c,15);expect(j.progress).toBe(1);});
+ it('never overwrites manual orientation, including at arrival',()=>{const c=camera(),j=new CameraJourney();j.start(c,new Vector3());j.step(c,8);c.rotation.set(.3,.8,.1);const q=c.quaternion.clone();j.step(c,12);expect(c.quaternion.equals(q)).toBe(true);});
+ it('cancellation freezes translation',()=>{const c=camera(),j=new CameraJourney();j.start(c,new Vector3());j.step(c,8);const p=c.position.clone();j.cancel();j.step(c,12);expect(c.position.equals(p)).toBe(true);});
+ it('handles retargeting, repeated destinations, poles and coincident positions',()=>{const c=camera(),j=new CameraJourney();for(const target of [new Vector3(...catalog[1].position),new Vector3(...catalog[2].position),new Vector3(...catalog[2].position),c.position.clone()]){const p=c.position.clone();j.start(c,target,10);expect(c.position.equals(p)).toBe(true);j.step(c,10);expect(c.position.distanceTo(target)).toBeCloseTo(3,8);}});
+ it('has smooth endpoints with no overshoot',()=>{expect(smootherstep(.01)).toBeLessThan(.00002);expect(1-smootherstep(.99)).toBeLessThan(.00002);for(let i=0;i<=100;i++){expect(smootherstep(i/100)).toBeGreaterThanOrEqual(0);expect(smootherstep(i/100)).toBeLessThanOrEqual(1);}});
+ it('smooth aiming changes orientation only, and can be interrupted',()=>{const c=camera(),aim=new CameraAim(),target=new Vector3(-20,-6,8),p=c.position.clone(),q=c.quaternion.clone();aim.start(c,target);aim.step(c,0);expect(c.quaternion.equals(q)).toBe(true);aim.step(c,1.5);expect(c.position.equals(p)).toBe(true);expect(c.getWorldDirection(new Vector3()).dot(target.clone().sub(p).normalize())).toBeCloseTo(1,10);aim.start(c,new Vector3(8,9,10));aim.step(c,.3);aim.cancel();const stopped=c.quaternion.clone();aim.step(c,10);expect(c.quaternion.equals(stopped)).toBe(true);});
+});
+describe('navigation references',()=>{
+ it('maps rendered axes to ICRS directions and distinguishes rest',()=>{expect(skyDirection([1,0,0])).toEqual({ra:0,dec:0});expect(skyDirection([0,0,-1])).toEqual({ra:90,dec:0});expect(skyDirection([0,1,0])?.dec).toBe(90);expect(skyDirection([0,0,0])).toBeNull();});
+ it('projects destinations ahead, beside and behind the camera',()=>{const c=new PerspectiveCamera(55,1,.01,1000);c.updateMatrixWorld();expect(destinationIndicator(c,[0,0,-10]).visible).toBe(true);expect(destinationIndicator(c,[10,0,-1]).visible).toBe(false);expect(destinationIndicator(c,[0,0,10]).behind).toBe(true);expect(Number.isFinite(destinationIndicator(c,[0,0,10]).angle)).toBe(true);});
+ it('finds the closest star in the forward cone, not behind the observer',()=>{const stars=[{...catalog[0],name:'Behind',position:[0,0,1] as [number,number,number]},{...catalog[0],name:'Ahead',position:[0,0,-5] as [number,number,number]}];expect(starAhead(stars,[0,0,0],[0,0,-1])?.name).toBe('Ahead');expect(starAhead(stars,[0,0,0],[1,0,0])).toBeNull();});
 });

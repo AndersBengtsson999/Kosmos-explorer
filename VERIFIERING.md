@@ -1,44 +1,24 @@
-# Cosmos Explorer 0.2 – kamerastyrning, 2026-11-01
+# Cosmos Explorer – tydligare rymdnavigering, 2026-11-02
 
-## Diagnos och baslinje
+## Ändringar
 
-De två befintliga Chrome-testerna passerade före omarbetningen. Den tidigare telemetriåterställningen reproducerades inte i den redan rättade versionen. Fixen med stabil kamerakonfiguration och memoiserad 3D-vy behålls.
+Befintligt projekt och Gaia-data bevarade. Position och orientering har separata modeller under en gemensam navigeringsägare. Resor har standardtid 20 sekunder och val 10/20/40/60, med smootherstep, paus/återupptagning, avbrott och återstående avstånd. Fri blick bevaras under färd och vid ankomst. Riktningshjälp vrider enbart kameran. Utan manuell blick riktas kameran mot stjärnan vid ankomst, på 3 ljusårs avstånd.
 
-Kodgranskningen visade kvarvarande svagheter: OrbitControls och resan hade varsin uppdatering av kameran, den exponentiella animationen saknade mjuk acceleration, och en separat lägeseffekt avbröt resor. Kamera och target använde däremot redan samma koordinatsystem.
+Rymdskeppsläget visar sikte, ICRS-blickriktning, faktisk färdriktning och hastighet, närmaste stjärna inom 12° framför kameran, destinationsdiamant/pil och avstånd. Stopp nollställer manuell hastighet. Skala och koordinataxlar kan aktiveras. Katalogpaneler döljs under färd och kan öppnas vid behov.
 
-## Lösning
+## Kontroller
 
-Navigation samordnar en aktiv ägare: resa, rymdskepp eller OrbitControls. Resan beräknas i renderingsvärldens ljusår, stannar 3 ljusår från målet och riktar kameran mot det. Smootherstep ger noll hastighet och acceleration vid start och slut; quaternion-slerp ger mjuk orientering. Orbit-inerti töms vid överlämning och aktuell kamerariktning bevaras, inklusive efter avbrott. Lägesbyte låter resan fortsätta. Knapp, Escape och manuell navigation kan avbryta.
+Slutresultat: **40 av 40 enhetstester och 4 av 4 Chrome-scenarier passerar**. Webbläsarkörningen tog 41,9 sekunder. TypeScript och produktionsbygge passerar.
 
-## Tester
+- 40 enhetstester för koordinater, verkliga data, katalogimport, flyginmatning, restider, paus, fri orientering, avbrott, riktningshjälp och projektion.
+- Fyra Chrome-scenarier för standardtid, paus/fri blick/återupptagning/avbrott och lägesbyte, 10-sekunders ankomst, färdriktning/stopp/riktningshjälp samt mobilkatalog och referenser.
+- TypeScript och Vite-produktionsbygge.
+- Dator- och mobilskärmbilder granskade. Inga falska bakgrundsstjärnor har lagts till.
 
-Slutresultat: **36 av 36 enhetstester och 3 av 3 Chrome-scenarier passerar**. Den isolerade webbläsarkörningen tog 47,9 sekunder. TypeScript-kontroll och produktionsbygge passerar. Skärmbilden vid ankomst visar Proxima centrerad och ett avstånd på 3,00 ljusår.
+Under testning rättades resepanelens placering över dragytan, tappad tangenttryckning vid snabbt lägesbyte och referenskontroller bakom mobilens sidfot. Testservern är isolerad från utvecklingsserverns automatiska omladdningar.
 
-36 enhetstester i två filer omfattar koordinater, katalogintegritet, flygning, slutposition, orientering, polriktningar, sammanfallande kamera/mål, avbrott, byte av destination mitt i resan, upprepade resor och resor mellan andra stjärnor än solen.
+## Begränsningar
 
-Tre Playwright-scenarier omfattar:
+Chrome verifieras med SwiftShader; fysisk mobil, Safari och hårdvaruaccelererad GPU är inte testade. En synlig flik som blockeras länge kan visa ett större positionssteg när bildrutorna återkommer. Dold flik pausar resan. Inga gravitations-, relativitets- eller fysiska kollisionsberäkningar ingår. Manuell blick bevaras även vid ankomst; riktningsknappen används om man vill titta mot stjärnan igen. Skalan och ICRS-axlarna ligger vid solen. Vite rapporterar fortsatt ett stort JavaScript-paket (cirka 1,2 MB, 341 kB gzip).
 
-1. Faktisk kameraförflyttning, stabil ankomst efter telemetriuppdateringar, rymdskeppsresa och flygknappar.
-2. Katalogsidor, återställning och mobil bredd.
-3. Lägesbyte under resa, avbrytknapp, frusen position och orientering efter avbrott, lägesbyte utan hopp, resa Proxima–Barnards stjärna, exakt slutavstånd och blickriktning, upprepad destination samt Escape.
-
-TypeScript-kontroll och Vite-produktionsbygge lyckas. Gaia-katalog och original-CSV är oförändrade.
-
-## Praktiska begränsningar
-
-Chrome använder SwiftShader (mjukvarurendering), vilket kan ge låg bildfrekvens. Första körningen av den utökade resan nådde 74 % innan den gamla tidsgränsen på 12 sekunder löpte ut. Väntetiden ändrades till 30 sekunder. Resans animationssteg är begränsat till 0,05 sekunder för att undvika stora hopp; dold flik pausar resan och låg bildfrekvens förlänger restiden.
-
-Fysisk mobil, Safari och hårdvaruaccelererad GPU är inte testade. Ingen fysisk kollisionsmodell eller ruttplanering runt andra stjärnmarkörer ingår; målstjärnans ankomstradie respekteras. Manuell flygning är fri. Vite varnar för cirka 1,2 MB JavaScript (339 kB gzip).
-
-## Reproducera
-
-```sh
-npm install
-npm test
-npm run build
-npm run test:e2e
-```
-
-Webbläsartesterna kräver Google Chrome och använder port 5175 med filbevakning avstängd.
-
-En separat körning stördes av Vites automatiska omladdningar, bekräftade i serverloggen och genom återställd sökning i felrapporten. Slutkörningen använder därför en isolerad testserver utan filbevakning; den vanliga förhandsvisningen behåller hot reload.
+Kör `npm test`, `npm run build` och `npm run test:e2e` för att reproducera kontrollerna. Webbläsartester kräver Google Chrome och använder port 5175.

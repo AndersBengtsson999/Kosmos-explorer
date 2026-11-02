@@ -84,23 +84,29 @@ RA/dec i grader, parallax och parallaxError i mas. `mag`, `bpRp` och `parallaxEr
 
 ## Begränsningar
 
-Ingen relativitet, stjärnutveckling, planetsystem, egenrörelse eller beständig lagring. Katalogen är ett urval. Mätosäkerheter visas men visualiseras inte som volymer. Hastighetsreglaget anger manuell flyghastighet; destinationsfärder använder separat kamerainterpolering. Vid mycket stora importer används en mesh per stjärna och prestandan kan minska. WebGL-fel ger ett meddelande medan katalogpanelen förblir tillgänglig. Mobil styrs med pekdrag och sex riktningsknappar.
+Ingen relativitet, stjärnutveckling, planetsystem, egenrörelse eller beständig lagring. Katalogen är ett urval. Mätosäkerheter visas men visualiseras inte som volymer. Hastighetsreglaget anger vald manuell hastighet. Faktisk hastighet visas separat; destinationsfärder använder vald restid. Vid mycket stora importer används en mesh per stjärna och prestandan kan minska. WebGL-fel ger ett meddelande medan katalogpanelen förblir tillgänglig. Mobil styrs med pekdrag och sex riktningsknappar.
 
-## Nytt i 0.2
+## Rymdnavigering
 
-- Kamerans startinställningar är stabila och 3D-vyn renderas inte om för varje telemetriuppdatering. Kamerafärder återställs därför inte av positionspanelen.
-- Flygknappar använder separata inmatningskällor för varje finger och tangent. Pekavbrott, förlorat fokus och dold flik tömmer inmatningen. WASD fungerar även efter att en knapp fått fokus.
-- Katalogen har sidindelning om 50 objekt, sortering efter namn eller avstånd och återställning av Gaia-katalogen efter import.
-- `npm run test:e2e` kör Chrome-tester för kamerafärd, flygknappar, katalogsidor och mobil bredd. Installerad Google Chrome krävs. Testservern använder port 5175 med filbevakning avstängd.
+- Resor tar **20 sekunder** som standard. Välj 10, 20, 40 eller 60 sekunder i stjärnans informationspanel. Inställningen gäller nästa resa.
+- Under färd visas namn, återstående väg till ankomstpunkten, aktuellt avstånd till stjärnan och en diskret förloppsindikator. Ankomst sker 3 ljusår från stjärnan och bekräftas med ett meddelande.
+- **Pausa / Återuppta** behåller position, resväg och tidsförlopp. **Avbryt resa** eller Escape lämnar kameran på aktuell plats.
+- Dra för att titta omkring under färd, även medan resan är pausad. Blicken återställs inte automatiskt. **Rikta mot destination** vrider mjukt tillbaka utan att ändra position eller resväg.
+- Utan manuell blick är kameran riktad mot stjärnan vid ankomst. Om användaren har tittat bort bevaras det valet även vid ankomst; rikta-knappen finns kvar.
+- I rymdskeppsläge visar **BLICK** kamerans riktning och **FÄRD** den verkliga rörelseriktningen och hastigheten. Sidorörelse ger alltså en annan färdriktning än blick. Stillastående visas uttryckligen. RA/Dec avser ICRS, omräknat från renderingsaxlarna.
+- Siktet visar skärmens mitt. Texten framför dig anger den närmaste katalogstjärnan inom 12° från siktet; tomt synfält rapporteras utan att någon stjärna hittas på.
+- Destinationen markeras med en diamant när den syns och en pil när den ligger utanför synfältet. Bakom kameran anges särskilt. Under automatisk resa avser indikatorn resans mål även om en annan katalogpost väljs.
+- **Stanna helt** eller mellanslag nollställer manuell hastighet och rensar inmatning. Under automatisk resa pausar stoppkommandot resan. Reglaget kan ställas på noll. WASD och Q/E anger kamerarelativ manuell rörelse; släppta tangenter ger stillastående, utan tröghet.
+- Sidopaneler döljs under resa och i rymdskeppsläge. **Välj stjärna** öppnar dem igen. **Avståndsskala** visar ett rutnät med 5 ljusår per ruta kring solen; **ICRS-axlar** visar X mot RA 0°, Y mot RA 90° och Z mot nord. Referenserna är förankrade i solsystemets origo och kan hamna utanför vyn vid fjärran positioner.
 
-## Kamerastyrning och resor
+### Gemensam navigeringsmodell
 
-Den ursprungliga återställningen orsakades av att kamerans startposition skickades in på nytt vid telemetriuppdateringar. Den tidigare fixen med stabil kamerakonfiguration och memoiserad 3D-vy behålls. Baslinjens två Chrome-tester passerade inför denna omarbetning: det gamla felet reproducerades alltså inte i den redan rättade versionen.
+`Navigation` samordnar ömsesidigt exklusiva ägare för förflyttning: `CameraJourney`, manuell rörelse eller OrbitControls. `CameraJourney` hanterar endast position och aktiv restid. `CameraAim` hanterar mjuk orientering; manuell blick avbryter endast orienteringshjälpen. OrbitControls uppdateras inte under resa eller aktiv riktningshjälp. Lägesbyte under resa ändrar inte resan eller blickriktningen.
 
-Granskningen visade återstående problem: Drei OrbitControls hade en egen uppdateringsloop samtidigt som reseanimationen flyttade kameran, exponentiell interpolation saknade mjuk acceleration, och en lägeseffekt avbröt pågående resor. Nu samordnar `Navigation` tre exklusiva tillstånd: resa, manuell flygning eller OrbitControls. Under resa är OrbitControls avstängd och uppdateras inte. När kontrollen lämnas tillbaka töms tidigare rotationsinerti och kamerans aktuella orientering bevaras, även efter avbrott.
+Resvägen använder samma världssystem (X,Z,−Y) i ljusår som katalogens positioner. En femtegradskurva, smootherstep, ger mjuk acceleration och inbromsning med noll hastighet och acceleration vid ändpunkterna. Blicken använder separat quaternion-slerp. Resans slutpunkt ligger på inflygningssidan av stjärnan. Sammanfallande positioner och polriktningar hanteras särskilt. Inga extra stjärnor skapas.
 
-`CameraJourney` tar en kopia av startposition och startorientering, beräknar ett mål 3 ljusår från stjärnan längs inflygningsriktningen och använder en femtegradskurva (smootherstep) med noll hastighet och acceleration vid ändpunkterna. Orientering interpoleras med quaternion-slerp. Alla vektorer använder samma renderingskoordinater (X,Z,−Y), i ljusår. Resans nominella längd är 1,2–4,5 sekunder. Tidssteg begränsas till 0,05 sekunder; dold flik pausar och låg bildfrekvens kan förlänga restiden.
+Tiden mäts i aktiva sekunder och är oberoende av bildfrekvens. Dold flik pausar automatiskt en resa; användaren återupptar den. En mycket lång renderingsblockering i synlig flik kan ge ett större positionssteg när renderingen fortsätter. Det finns ingen fysisk kollisionsmodell eller ruttplanering runt andra stjärnmarkörer. Manuell blick har företräde framför automatisk riktning vid ankomst. Flygningen är inte relativistisk.
 
-**Avbryt** med knappen, Escape eller manuell navigation. Lägesbyte under resa låter resan fortsätta; efter ankomst används det nya läget. Ny destination under pågående resa startar från den aktuella kameran. Upprepade resor till samma stjärna ger samma slutposition. Resan stannar utanför målstjärnans symboliska markör; start inuti ankomstradien ger en utåtriktad förflyttning. Polriktningar och sammanfallande kamera/mål hanteras särskilt.
+### Verifiera
 
-Detta är visuell navigation. Det finns ingen fysisk kollisionsmodell eller ruttplanering runt andra stjärnmarkörer, och manuell flygning är fri. Kamerans rullning kan bevaras vid avbrott för att undvika en plötslig horisontändring. Astronomiska katalogdata är oförändrade.
+`npm test` kör 40 enhetstester. `npm run test:e2e` kör fyra Chrome-scenarier för tidsval, resa, paus, fri blick, återupptagning, avbrott, lägesbyte, ankomst, riktning, stopp och mobilreferenser. Testservern använder port 5175 med filbevakning avstängd; Google Chrome måste vara installerad. `npm run build` gör TypeScript-kontroll och produktionsbygge.
