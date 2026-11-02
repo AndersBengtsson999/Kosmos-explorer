@@ -2,7 +2,7 @@
 
 ## Resultat
 
-45 av 45 enhetstester och 5 av 5 Chrome-scenarier passerar. Den slutliga webbläsarkörningen tog 59,0 sekunder. TypeScript och Vite-produktionsbygge passerar. Skärmbilder för dator och mobil har granskats.
+46 av 46 enhetstester och 5 av 5 Chrome-scenarier passerar. Den slutliga webbläsarkörningen tog 45,0 sekunder. TypeScript och Vite-produktionsbygge passerar. Webbläsarscenarier för dator och mobil passerar.
 
 ## Verkliga katalogdata
 
@@ -16,8 +16,10 @@ Chrome med SwiftShader, 1280 × 720, DPR 1. Statisk standardvy, cirka fem sekund
 
 | Källor | Median bildruta | P95 | JS-heap | GPU-punktattribut | Ritningsanrop | Närsökning |
 |---:|---:|---:|---:|---:|---:|---:|
-| 10000 | 67.5 ms | 86.2 ms | 45.7 MB | 0.28 MB | 2 | 8.3 ms |
-| 100000 | 120.3 ms | 159.3 ms | 134.5 MB | 2.80 MB | 2 | 91.1 ms |
+| 10000 | 31.2 ms | 40.0 ms | 40.4 MB | 0.28 MB | 2 | 2.8 ms |
+| 100000 | 55.4 ms | 64.4 ms | 78.1 MB | 2.80 MB | 2 | 46.8 ms |
+
+Upprepad närsökning från samma position: 0,1 ms (10k), 0,8 ms (100k). Tidigare separata körning gav median 67,5/120,3 ms. Detta är inte ett isolerat A/B-test; belastningen på datorn kan variera.
 
 Fullständiga mätvärden, antal sampel och miljö finns i PERFORMANCE.json. JS-heap är inte total processminne; GPU-attributmåttet exkluderar drivrutin, framebuffer och övrig GPU-allokering. 100k fungerar men är inte flytande i denna mjukvarurendering. Hårdvaruaccelererad GPU, Safari och fysisk mobil återstår att mäta.
 
@@ -42,3 +44,7 @@ npm run test:e2e
 ```
 
 Google Chrome krävs för webbläsartester. Importskriptet kräver Python 3 och curl.
+
+## Fortsatt prestandaarbete
+
+Dold navigerings-HUD är avmonterad i kartläge och gör inga koniska stjärnsökningar. Destinationslinjen återanvänder buffert och målreferens i stället för att söka hela katalogen och skapa vektorer varje bildruta. Sökning cachar sortering per oföränderlig katalog och senaste närposition, använder kvadrerade avstånd och återanvänder svensk namnjämförare. Nytt test kontrollerar positionsbyte, katalogbyte, resultatmutation och filtrerad avståndsordning. Kamerakoden och samtliga astronomiska positioner är oförändrade.

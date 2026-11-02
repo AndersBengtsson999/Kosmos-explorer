@@ -3,27 +3,59 @@
   "reports": [
     {
       "count": 10000,
-      "samples": 72,
-      "medianFrameMs": 67.5,
-      "p95FrameMs": 86.19999992847443,
+      "samples": 146,
+      "medianFrameMs": 31.200000047683716,
+      "p95FrameMs": 40,
       "drawCalls": 2,
       "geometries": 2,
-      "jsHeapBytes": 45662526,
+      "jsHeapBytes": 40402141,
       "pointAttributeBytes": 280028,
-      "nearestSearchMs": 8.300000071525574,
+      "nearestSearchMs": 2.8000000715255737,
+      "repeatedSearchMs": 0.09999990463256836,
       "nearest": "Gaia DR3 1838855376946302720"
     },
     {
       "count": 100000,
-      "samples": 40,
-      "medianFrameMs": 120.29999995231628,
-      "p95FrameMs": 159.29999995231628,
+      "samples": 89,
+      "medianFrameMs": 55.39999997615814,
+      "p95FrameMs": 64.39999997615814,
       "drawCalls": 2,
       "geometries": 2,
-      "jsHeapBytes": 134547815,
+      "jsHeapBytes": 78145405,
       "pointAttributeBytes": 2800028,
-      "nearestSearchMs": 91.10000002384186,
+      "nearestSearchMs": 46.799999952316284,
+      "repeatedSearchMs": 0.7999999523162842,
       "nearest": "Gaia DR3 1838855376946302720"
     }
-  ]
+  ],
+  "previousRun": {
+    "environment": "Headless Chrome, SwiftShader, 1280x720, DPR 1, static initial view; frame intervals, not GPU timestamps; JS heap after GC; CPU nearest search",
+    "reports": [
+      {
+        "count": 10000,
+        "samples": 72,
+        "medianFrameMs": 67.5,
+        "p95FrameMs": 86.19999992847443,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 45662526,
+        "pointAttributeBytes": 280028,
+        "nearestSearchMs": 8.300000071525574,
+        "nearest": "Gaia DR3 1838855376946302720"
+      },
+      {
+        "count": 100000,
+        "samples": 40,
+        "medianFrameMs": 120.29999995231628,
+        "p95FrameMs": 159.29999995231628,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 134547815,
+        "pointAttributeBytes": 2800028,
+        "nearestSearchMs": 91.10000002384186,
+        "nearest": "Gaia DR3 1838855376946302720"
+      }
+    ]
+  },
+  "comparisonNote": "Separate runs on the same configured SwiftShader environment, not an isolated controlled A/B benchmark; machine load can vary."
 }

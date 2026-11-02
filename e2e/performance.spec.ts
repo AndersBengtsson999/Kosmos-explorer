@@ -16,8 +16,9 @@ test('real 10k and 100k catalogs: frame time, memory, nearest search and load fa
    const {renderMetrics}=await import(path),{useStore}=await import(statePath),{searchStars}=await import(searchPath);
    const state=useStore.getState(),frames=[...renderMetrics.frames].sort((a:number,b:number)=>a-b);
    const start=performance.now();const nearest=searchStars(state.stars,'','nearby',state.position);const searchMs=performance.now()-start;
+   const repeatStart=performance.now();searchStars(state.stars,'','nearby',state.position);const repeatedSearchMs=performance.now()-repeatStart;
    const memory=(performance as unknown as {memory?:{usedJSHeapSize:number}}).memory;
-   return {count:state.stars.length-1,samples:frames.length,medianFrameMs:frames[Math.floor(frames.length*.5)],p95FrameMs:frames[Math.floor(frames.length*.95)],drawCalls:renderMetrics.drawCalls,geometries:renderMetrics.geometries,jsHeapBytes:memory?.usedJSHeapSize??null,pointAttributeBytes:state.stars.length*28,nearestSearchMs:searchMs,nearest:nearest[0].id};
+   return {count:state.stars.length-1,samples:frames.length,medianFrameMs:frames[Math.floor(frames.length*.5)],p95FrameMs:frames[Math.floor(frames.length*.95)],drawCalls:renderMetrics.drawCalls,geometries:renderMetrics.geometries,jsHeapBytes:memory?.usedJSHeapSize??null,pointAttributeBytes:state.stars.length*28,nearestSearchMs:searchMs,repeatedSearchMs,nearest:nearest[0].id};
   }));
   expect(reports.at(-1)!.count).toBe(count);expect(reports.at(-1)!.drawCalls).toBeLessThan(20);expect(reports.at(-1)!.samples).toBeGreaterThan(5);
  }

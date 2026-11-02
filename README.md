@@ -155,3 +155,7 @@ Sökningen normaliserar accenttecken, blanksteg och skiljetecken och accepterar 
 ### Prestanda och avgränsning
 
 Se `PERFORMANCE.json` och `VERIFIERING.md` för uppmätta resultat. Testerna använder verkliga 10k/100k-poster i Chrome med SwiftShader, inte duplicerade teststjärnor. Mätt tid är bildruteintervall på CPU-sidan, inte GPU-tidsstämplar. JS-heap och storleken på punktattribut rapporteras separat; de utgör inte total browser-/GPU-/systemminnesanvändning. 100k stöds funktionellt men har låg bildfrekvens i mjukvarurenderingen. Hårdvaruaccelererad GPU och fysiska mobiler återstår att mäta. Global luminositet, detaljerade spektralklasser och fullständig exoplanetmatchning återstår. Vite varnar fortfarande för ett stort JavaScript-paket.
+
+### Fortsatt optimering
+
+Kartläget gör inte längre dolda HUD-sökningar i hela katalogen. Destinationslinjen återanvänder sin grafikbuffert och sökning återanvänder katalogens sortering. Närpositionens cache ersätts när utgångspunkten ändras. Kataloger behandlas som oföränderliga; import skapar en ny array. Resor och kamerastyrning är oförändrade. Aktuella mätvärden och tidigare separata körning finns i `PERFORMANCE.json`; 46 enhetstester och fem webbläsarscenarier passerar.
