@@ -15,10 +15,10 @@ export function destinationIndicator(camera:PerspectiveCamera,target:Vec3){
  return {x:visible?projected.x:Math.cos(angle)*.8,y:visible?-projected.y:Math.sin(angle)*.7,visible,behind:local.z>=0,angle:angle*180/Math.PI};
 }
 export function starAhead(stars:Star[],position:Vec3,forward:Vec3){
- const origin=new Vector3(...position),direction=new Vector3(...forward).normalize();
+ const length=Math.hypot(...forward)||1,threshold=Math.cos(12*Math.PI/180);
  let nearest:Star|null=null,best=Infinity;
- for(const star of stars){const offset=new Vector3(...star.position).sub(origin),range=offset.length();
-  if(range>1e-6&&offset.divideScalar(range).dot(direction)>=Math.cos(12*Math.PI/180)&&range<best){nearest=star;best=range;}
+ for(const star of stars){const dx=star.position[0]-position[0],dy=star.position[1]-position[1],dz=star.position[2]-position[2],range=Math.hypot(dx,dy,dz);
+  if(range>1e-6&&range<best&&(dx*forward[0]+dy*forward[1]+dz*forward[2])/(range*length)>=threshold){nearest=star;best=range;}
  }
  return nearest?{name:nearest.name,distance:best}:null;
 }

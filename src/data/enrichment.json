@@ -1,0 +1,11 @@
+{
+ "Gaia DR3 5853498713190525696": {
+  "spectralClass": "M (bred typ)",
+  "planets": [
+   {"name":"Proxima Centauri b","source":"https://science.nasa.gov/exoplanet-catalog/proxima-centauri-b/"},
+   {"name":"Proxima Centauri d","source":"https://science.nasa.gov/exoplanet-catalog/proxima-centauri-d/"}
+  ],
+  "checked":"2026-11-02",
+  "note":"Manuellt verifierat urval från NASA Science, inte en komplett exoplanetkorsmatchning."
+ }
+}

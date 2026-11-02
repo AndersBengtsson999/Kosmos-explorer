@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import {catalog,sun,type Star} from './data/catalog';
 import type {Vec3} from './math/coordinates';
 import {flightInput} from './navigation/flightInput';
-interface State {
+interface State {catalogStatus:string;catalogError:boolean;showOverview:boolean;
  journey:{active:boolean;progress:number;paused:boolean;remaining:number;arrived:boolean};duration:number;
  cancelRequest:number;aimRequest:number;stopRequest:number;
  cancelTravel:()=>void;aim:()=>void;stop:()=>void;togglePause:()=>void;setDuration:(duration:number)=>void;
@@ -14,7 +14,7 @@ interface State {
  telemetry:(position:Vec3,moving:boolean,forward?:Vec3,velocity?:Vec3,indicator?:State['indicator'])=>void;
  resetCatalog:()=>void;importStars:(stars:Star[])=>void;
 }
-export const useStore=create<State>((set)=>({
+export const useStore=create<State>((set)=>({catalogStatus:'Lokal startkatalog · 150 stjärnor',catalogError:false,showOverview:true,
  journey:{active:false,progress:0,paused:false,remaining:0,arrived:false},duration:20,
  cancelRequest:0,aimRequest:0,stopRequest:0,showScale:false,showAxes:false,
  cancelTravel:()=>set(s=>({cancelRequest:s.cancelRequest+1})),aim:()=>set(s=>({aimRequest:s.aimRequest+1})),

@@ -1,24 +1,44 @@
-# Cosmos Explorer – tydligare rymdnavigering, 2026-11-02
+# Cosmos Explorer 0.4 – verifiering 2026-11-02
 
-## Ändringar
+## Resultat
 
-Befintligt projekt och Gaia-data bevarade. Position och orientering har separata modeller under en gemensam navigeringsägare. Resor har standardtid 20 sekunder och val 10/20/40/60, med smootherstep, paus/återupptagning, avbrott och återstående avstånd. Fri blick bevaras under färd och vid ankomst. Riktningshjälp vrider enbart kameran. Utan manuell blick riktas kameran mot stjärnan vid ankomst, på 3 ljusårs avstånd.
+45 av 45 enhetstester och 5 av 5 Chrome-scenarier passerar. Den slutliga webbläsarkörningen tog 59,0 sekunder. TypeScript och Vite-produktionsbygge passerar. Skärmbilder för dator och mobil har granskats.
 
-Rymdskeppsläget visar sikte, ICRS-blickriktning, faktisk färdriktning och hastighet, närmaste stjärna inom 12° framför kameran, destinationsdiamant/pil och avstånd. Stopp nollställer manuell hastighet. Skala och koordinataxlar kan aktiveras. Katalogpaneler döljs under färd och kan öppnas vid behov.
+## Verkliga katalogdata
 
-## Kontroller
+100 000 unika ESA Gaia DR3-källor importerades direkt från ESA TAP. 10 000 laddas normalt; 100 000 väljs i inställningar. Solen läggs till som origo. Original-CSV, frågan, hämtningstid, SHA-256 och reproducerbart importskript ingår. ICRS, J2016.0. Urvalet sträcker sig från 4,25 till 239,76 ljusår. 28 894 källor har modelltemperatur.
 
-Slutresultat: **40 av 40 enhetstester och 4 av 4 Chrome-scenarier passerar**. Webbläsarkörningen tog 41,9 sekunder. TypeScript och produktionsbygge passerar.
+Källor: ESA Gaia DR3 för astrometri/fotometri/temperatur; NASA Science för ett begränsat Proxima b/d-exempel; Astropy Galactocentric-referensen för riktningen mot galaxcentrum. Se README för direkta länkar. NASA:s TAP gav HTTP 525; någon komplett exoplanetimport kunde därför inte verifieras.
 
-- 40 enhetstester för koordinater, verkliga data, katalogimport, flyginmatning, restider, paus, fri orientering, avbrott, riktningshjälp och projektion.
-- Fyra Chrome-scenarier för standardtid, paus/fri blick/återupptagning/avbrott och lägesbyte, 10-sekunders ankomst, färdriktning/stopp/riktningshjälp samt mobilkatalog och referenser.
-- TypeScript och Vite-produktionsbygge.
-- Dator- och mobilskärmbilder granskade. Inga falska bakgrundsstjärnor har lagts till.
+## Prestanda
 
-Under testning rättades resepanelens placering över dragytan, tappad tangenttryckning vid snabbt lägesbyte och referenskontroller bakom mobilens sidfot. Testservern är isolerad från utvecklingsserverns automatiska omladdningar.
+Chrome med SwiftShader, 1280 × 720, DPR 1. Statisk standardvy, cirka fem sekunders mätning per katalog. Bildruteintervall är inte GPU-renderingstidsstämplar. JS-heap mäts efter begärd garbage collection.
 
-## Begränsningar
+| Källor | Median bildruta | P95 | JS-heap | GPU-punktattribut | Ritningsanrop | Närsökning |
+|---:|---:|---:|---:|---:|---:|---:|
+| 10000 | 67.5 ms | 86.2 ms | 45.7 MB | 0.28 MB | 2 | 8.3 ms |
+| 100000 | 120.3 ms | 159.3 ms | 134.5 MB | 2.80 MB | 2 | 91.1 ms |
 
-Chrome verifieras med SwiftShader; fysisk mobil, Safari och hårdvaruaccelererad GPU är inte testade. En synlig flik som blockeras länge kan visa ett större positionssteg när bildrutorna återkommer. Dold flik pausar resan. Inga gravitations-, relativitets- eller fysiska kollisionsberäkningar ingår. Manuell blick bevaras även vid ankomst; riktningsknappen används om man vill titta mot stjärnan igen. Skalan och ICRS-axlarna ligger vid solen. Vite rapporterar fortsatt ett stort JavaScript-paket (cirka 1,2 MB, 341 kB gzip).
+Fullständiga mätvärden, antal sampel och miljö finns i PERFORMANCE.json. JS-heap är inte total processminne; GPU-attributmåttet exkluderar drivrutin, framebuffer och övrig GPU-allokering. 100k fungerar men är inte flytande i denna mjukvarurendering. Hårdvaruaccelererad GPU, Safari och fysisk mobil återstår att mäta.
 
-Kör `npm test`, `npm run build` och `npm run test:e2e` för att reproducera kontrollerna. Webbläsartester kräver Google Chrome och använder port 5175.
+## Täckning
+
+Enhetstester: båda verkliga binärkatalogerna, unika och exakta 64-bitars-ID:n, kvalitetssnitt, koordinater, normaliserad namn/ID-sökning, närsökning från godtycklig position, korrupta data, JSON-import och befintlig reslogik.
+
+Chrome: defaultrestid, paus, fri blick, återupptagning, avbrott, lägesbyte, 10-sekunders ankomst, klickval i GPU-punktmolnet, manuell rörelse, stopp, riktningshjälp, mobilreferenser, 10k/100k-byte, shaderfel och bevarad 100k-katalog efter simulerat HTTP 503. Kamerans förflyttnings- och orienteringsmodeller har inte ändrats.
+
+## Kvarvarande begränsningar
+
+Luminositet och detaljerad spektralklass saknas i det hämtade urvalet och visas som Okänt. Planeter är inte systematiskt korsmatchade; endast Proxima-exemplet är källbelagt. Okänt betyder inte att inga planeter finns. Punktstorleken är avståndsanpassad men ingen spatial strömning/octree-LOD ingår. Val i ett överlappande punktmoln sker inom 8 pixlar; sökning ger tillgång till varje post. GPU-positioner avrundas till float32; original och navigering behåller float64. Ingen ny fysisk simulering ingår. Vite varnar fortsatt för cirka 1,2 MB JavaScript (342 kB gzip).
+
+## Reproducera
+
+```sh
+python3 scripts/import-gaia.py
+npm install
+npm test
+npm run build
+npm run test:e2e
+```
+
+Google Chrome krävs för webbläsartester. Importskriptet kräver Python 3 och curl.

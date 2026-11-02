@@ -15,7 +15,7 @@ describe('catalog and import',()=>{
  it.each([{ra:360},{dec:-91},{parallax:0},{epoch:NaN},{source:''},{mag:'8'},{parallaxError:-1}])('rejects malformed values %o',patch=>expect(()=>parseCatalog([{...raw[0],...patch}])).toThrow());
  it('recomputes positions instead of trusting supplied coordinates',()=>expect(parseCatalog([{...raw[0],position:[999,999,999]}])[0].position).toEqual(catalog[1].position));
  it('accepts explicitly unknown photometry',()=>expect(parseCatalog([{...raw[0],mag:null,bpRp:null}])[0].mag).toBeNull());
- it('rejects empty and oversized imports',()=>{expect(()=>parseCatalog([])).toThrow();expect(()=>parseCatalog(Array(5001).fill(raw[0]))).toThrow();});
+ it('rejects empty and oversized imports',()=>{expect(()=>parseCatalog([])).toThrow();expect(()=>parseCatalog(Array(100001).fill(raw[0]))).toThrow();});
 });
 describe('flight integration',()=>{
  it('normalizes diagonal movement',()=>expect(distance(movement(new Set(['KeyW','KeyD']),10,.02))).toBeCloseTo(.2));

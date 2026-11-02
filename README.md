@@ -1,4 +1,4 @@
-# Cosmos Explorer 0.2
+# Cosmos Explorer 0.4
 
 Körbar, lokal 3D-stjärnkarta med React, TypeScript, Vite, Three.js / React Three Fiber, Zustand och Vitest. Svenskt responsivt gränssnitt. Kräver Node.js 22.12+ och en modern webbläsare med WebGL.
 
@@ -22,7 +22,7 @@ npm run dev
 
 ## Verifierad katalog och proveniens
 
-150 källor från **ESA Gaia DR3**, hämtade 2026-11-01 via [ARI Heidelberg TAP](https://gaia.ari.uni-heidelberg.de/tap.html). ESA:s primära TAP svarade HTTP 503, varefter universitetets Gaia-spegel användes. Ursprungligt, oförändrat svar: `data/gaia-dr3.csv`. Lokal appkatalog: `src/data/stars.json`. Konverteringen kan reproduceras med `python3 scripts/convert-catalog.py` (endast standardbibliotek).
+Den äldre startkatalogen innehåller 150 källor från **ESA Gaia DR3**, hämtade 2026-11-01 via [ARI Heidelberg TAP](https://gaia.ari.uni-heidelberg.de/tap.html). ESA:s primära TAP svarade HTTP 503, varefter universitetets Gaia-spegel användes. Ursprungligt, oförändrat svar: `data/gaia-dr3.csv`. Lokal appkatalog: `src/data/stars.json`. Konverteringen kan reproduceras med `python3 scripts/convert-catalog.py` (endast standardbibliotek).
 
 Exakt ADQL-fråga, anropad mot `https://gaia.ari.uni-heidelberg.de/tap/sync` med REQUEST=doQuery, LANG=ADQL, FORMAT=csv:
 
@@ -50,7 +50,7 @@ This work has made use of data from the European Space Agency (ESA) mission Gaia
 
 ## JSON-import
 
-Import ersätter katalogen för den aktuella sessionen och bevarar solen. Ladda om sidan för att återställa standardkatalogen. Max 5 MB och 5000 stjärnor. Fel rapporteras utan att befintlig katalog ändras. Exempel med verkliga data:
+Import ersätter katalogen för den aktuella sessionen och bevarar solen. Ladda om sidan för att återställa standardkatalogen. Max 80 MB och 100 000 stjärnor. Fel rapporteras utan att befintlig katalog ändras. Exempel med verkliga data:
 
 ```json
 [
@@ -109,4 +109,49 @@ Tiden mäts i aktiva sekunder och är oberoende av bildfrekvens. Dold flik pausa
 
 ### Verifiera
 
-`npm test` kör 40 enhetstester. `npm run test:e2e` kör fyra Chrome-scenarier för tidsval, resa, paus, fri blick, återupptagning, avbrott, lägesbyte, ankomst, riktning, stopp och mobilreferenser. Testservern använder port 5175 med filbevakning avstängd; Google Chrome måste vara installerad. `npm run build` gör TypeScript-kontroll och produktionsbygge.
+`npm test` kör 45 enhetstester. `npm run test:e2e` kör fem Chrome-scenarier för tidsval, resa, paus, fri blick, återupptagning, avbrott, lägesbyte, ankomst, riktning, stopp och mobilreferenser. Testservern använder port 5175 med filbevakning avstängd; Google Chrome måste vara installerad. `npm run build` gör TypeScript-kontroll och produktionsbygge.
+
+## Levande universum – 0.4
+
+**100 000 verkliga Gaia DR3-källor** är inkluderade plus solen som origo. En snabb lokal startkatalog med 150 källor visas omedelbart; **10 000** laddas därefter i en Web Worker. Under *Visning och katalog* kan man välja **100 000**. Standardladdningen hämtar inte 100k-filen. Misslyckad laddning visar ett felmeddelande och bevarar fungerande data. Egen JSON-import avbryter eventuell bakgrundsladdning så att den inte kan skriva över användarens katalog.
+
+### Reproducerbara data
+
+Kör `python3 scripts/import-gaia.py` (Python-standardbibliotek och curl med certifikatkontroll). Skriptet provar ESA:s TAP först och ARI Heidelberg som reserv. Den levererade katalogen hämtades **2026-11-02 direkt från ESA** med:
+
+```sql
+SELECT TOP 100000 source_id,ra,dec,parallax,parallax_error,
+       phot_g_mean_mag,bp_rp,teff_gspphot
+FROM gaiadr3.gaia_source
+WHERE parallax > 5 AND parallax_over_error > 20 AND ruwe < 1.4
+ORDER BY parallax DESC, source_id ASC
+```
+
+- Originalsvaret finns i `data/gaia-dr3-100k.csv` (11 032 477 byte).
+- `public/catalog/metadata.json` innehåller exakt fråga, endpoint, tid, schema, enheter och SHA-256 för originalsvaret.
+- `public/catalog/gaia-10000.bin`: 640 000 byte. `gaia-100000.bin`: 6 400 000 byte.
+- Varje post är 64 byte, little-endian: uint64 Gaia-ID och sju float64-värden i ordningen RA, Dec, parallax, parallaxfel, G-magnitud, BP−RP, temperatur. NaN betyder saknat värde. ID konverteras via BigInt, aldrig via JavaScript Number.
+- ICRS, referensepok **J2016.0**, statiska positioner. Parallaxavstånd utan nollpunktskorrektion. Urvalet sträcker sig cirka **4,25–239,76 ljusår** och är kvalitetsfiltrerat, inte komplett.
+- Alla 100 000 poster har astrometri i detta urval; **28 894** har GSP-Phot-temperatur. Temperatur är modellskattad från BP/RP-spektra: [Gaia-datamodellen](https://gaia.aip.de/metadata/gaiadr3/gaia_source/).
+
+### Rendering och val
+
+Ett GPU-punktmoln använder en BufferGeometry och en ShaderMaterial för hela katalogen. Position, färg och magnitud upptar 28 byte per källa i GPU-attribut. Punktstorleken anpassas efter avstånd och G-magnitud och begränsas till 1–6 CSS-pixlar, så att stjärnor inte blir stora klot vid inzoomning. Färg kommer från samma schematiska BP−RP-klasser som tidigare. Magnituden påverkar visuellt komprimerad ljusstyrka; detta är inte en fotometriskt kalibrerad simulator.
+
+CPU-beräkningar och lagring använder float64. GPU-positioner använder float32, vilket ger små avrundningar i den lokala kartan; koordinaterna i katalogen ändras inte. Punktmolnet har ingen extra syntetisk bakgrund. Detaljnivån består av avståndsanpassad punktstorlek, inte ett flernivåsystem med strömmande rymdvolymer.
+
+Stjärnval görs på klick genom projektion till skärmpixlar, med 8-pixelstolerans. Inget kostsamt raycast körs för varje musrörelse. Vid överlapp väljs punkten närmast klicket; sökningen gör varje katalogpost åtkomlig. Endast vald stjärna etiketteras i kartan för att undvika etikettmoln; navigeringsindikatorn visas i rymdskeppsläge. Kamerans resemodell är oförändrad.
+
+### Information och upptäckter
+
+Panelen visar ID, avstånd från användaren och solen, G-magnitud och temperatur. Fler uppgifter finns i en fällbar sektion. Observerad astrometri/fotometri skiljs från invers-parallaxavstånd och modelltemperatur. Spektralklass, luminositet och exoplaneter visas som **Okänt** där källuppgifter saknas; spektraltyp eller bolometrisk ljusstyrka räknas inte fram från otillräckliga data.
+
+`src/data/enrichment.json` innehåller ett manuellt verifierat, begränsat exempel: Proxima Centauri b och d med länkar till [NASA b](https://science.nasa.gov/exoplanet-catalog/proxima-centauri-b/) och [NASA d](https://science.nasa.gov/exoplanet-catalog/proxima-centauri-d/). NASA anger bred M-typ för värdstjärnan. Verifierat 2026-11-02. Detta är inte en fullständig planetkorsmatchning. NASA:s TAP gav HTTP 525 under arbetet; därför hävdas ingen automatiskt importerad exoplanetkatalog.
+
+Sökningen normaliserar accenttecken, blanksteg och skiljetecken och accepterar även enbart det numeriska Gaia-ID:t. *Utforska i närheten* sorterar från kamerans position när knappen trycks. Listan är en ögonblicksbild; tryck igen efter fortsatt förflyttning för att uppdatera.
+
+Översikten kan döljas och visar sol, kamera, valt mål och riktning mot galaxcentrum. Den projicerar samma världskoordinater som huvudvyn på X/Z-planet (ICRS X/−Y); nordhöjden visas separat. Skalan anpassas till sol, kamera och destination. Galaxcentrum visas som en riktning, inte som en påhittad stjärna eller mätpunkt: ICRS RA 266,4051°, Dec −28,936175°, enligt [Astropys Galactocentric-referens](https://docs.astropy.org/en/stable/api/astropy.coordinates.Galactocentric.html).
+
+### Prestanda och avgränsning
+
+Se `PERFORMANCE.json` och `VERIFIERING.md` för uppmätta resultat. Testerna använder verkliga 10k/100k-poster i Chrome med SwiftShader, inte duplicerade teststjärnor. Mätt tid är bildruteintervall på CPU-sidan, inte GPU-tidsstämplar. JS-heap och storleken på punktattribut rapporteras separat; de utgör inte total browser-/GPU-/systemminnesanvändning. 100k stöds funktionellt men har låg bildfrekvens i mjukvarurenderingen. Hårdvaruaccelererad GPU och fysiska mobiler återstår att mäta. Global luminositet, detaljerade spektralklasser och fullständig exoplanetmatchning återstår. Vite varnar fortfarande för ett stort JavaScript-paket.

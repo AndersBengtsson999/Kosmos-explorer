@@ -32,6 +32,7 @@ test('10 second arrival and aim leave the camera at three light years',async({pa
  const arrived=await pose(page);expect(gap(arrived.position,target)).toBeCloseTo(3,5);
  const [x,y,z,w]=arrived.quaternion;const forward=[-2*(x*z+w*y),-2*(y*z-w*x),-(1-2*(x*x+y*y))];
  expect(forward.reduce((sum,v,i)=>sum+v*(target[i]-arrived.position[i])/3,0)).toBeCloseTo(1,5);
+ await select(page,'Proxima');await page.mouse.click(640,360);await expect(page.locator('.details h2')).toHaveText('Barnards stjärna');
  await page.screenshot({path:'work/arrival.png'});
 });
 
@@ -54,12 +55,12 @@ test('ship HUD, side movement, stop and destination aiming',async({page})=>{
 
 test('mobile catalog, references and immersive controls',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');
- await expect(page.locator('.result')).toHaveCount(50);for(let i=0;i<3;i++)await page.getByRole('button',{name:'Nästa sida'}).click();await expect(page.locator('.result')).toHaveCount(1);
+ await expect(page.locator('.result')).toHaveCount(50);await page.getByRole('button',{name:'Nästa sida'}).click();await expect(page.locator('.result')).toHaveCount(50);
  await page.getByRole('button',{name:'Återställ Gaia-katalog'}).click();
  // Reset starts a journey home; cancel before changing catalog view.
  await expect(page.getByRole('button',{name:'Avbryt resa'})).toBeVisible();await page.getByRole('button',{name:'Avbryt resa'}).click();
  await page.getByRole('button',{name:'Rymdskepp',exact:false}).click();
- await page.getByRole('checkbox',{name:'ICRS-axlar'}).check();
+ await page.locator('.reference-controls summary').click();await page.getByRole('checkbox',{name:'ICRS-axlar'}).check();
  await page.getByRole('checkbox',{name:'Avståndsskala',exact:false}).check();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
  await page.screenshot({path:'work/mobile-navigation.png',fullPage:true});
