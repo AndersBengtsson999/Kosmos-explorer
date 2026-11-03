@@ -182,3 +182,28 @@ Närbilder beräknas relativt kameran i float64 innan GPU-rendering i radieenhet
 Radieunderlaget och planetvärdarna är ofullständiga och framgår i gränssnittet. Varken temperaturer eller radier hittas på. Åtta samtidiga sfärer är en medveten detaljgräns; ingen fullskalig yt-/planet-/systemmodell ingår. Äldre uppgifter om tre ljusårs ankomst ovan beskriver tidigare versioner och har ersatts av den radieanpassade modellen.
 
 Testerna omfattar sortering, filtrering, saknade värden, importvalidering, vinkelstorlek, övertoningskurva, radie/synfält, precisionssäker siktning, närindex och ytskydd samt resor, paus och avbrott. Webbläsartester inkluderar Upptäck, närankomst, lokal rotation, mobil och verkliga 10k/100k-kataloger. Se VERIFIERING.md för senaste körningen och mätvärden.
+
+
+## Katalogfix: Sirius och kända stjärnor (2026-11-03)
+
+### Grundorsak
+
+Sirius A fanns inte i någon av appens Gaia-kataloger. Den närmaste posten i 100k-uttaget ligger 739,26 bågsekunder bort och är ett annat objekt. Importen tar de 100 000 största parallaxerna med `parallax > 5`, `parallax_over_error > 20` och `ruwe < 1.4`; det är inte en komplett himmelskatalog. Mycket ljusstarka stjärnor är ofullständigt representerade i Gaia, se [Gaia-observationer av ljusstarka stjärnor](https://arxiv.org/abs/1605.08347).
+
+En ofiltrerad Gaia DR3-fråga inom en bågminut från Sirius hittar **Sirius B**, `2947050466531873024`, med RUWE 2,4190555, som appens kvalitetsfilter därför utesluter. Den posten är inte Sirius A. SIMBAD kopplar A till HIP 32349 och HD 48915, utan Gaia DR3-korsidentifierare. Ingen annan Gaia-post antas vara Sirius A enbart på grund av närhet. Fråga och råsvar finns i `data/sirius-catalog-audit.json`. Ytterligare problem var att endast Proxima/Barnard hade vanliga namn, att alias inte indexerades och att katalogbyten helt ersatte tidigare data. Sökningen omfattade redan alla inlästa objekt; sidindelningen var inte orsaken.
+
+### Baskatalog och proveniens
+
+Solen plus nio källbelagda objekt finns alltid: Sirius A, Proxima, Alpha Centauri A och B, Barnards stjärna, Vega, Arcturus, Betelgeuse och Rigel. SIMBADs officiella Harvard-spegel levererar positionsvärden, parallax/osäkerhet, bibliografiska referenser och korsidentifierare. För Sirius används RA 101,28715533333335°, Dec −16,71611586111111°, parallax 379,21 ± 1,58 mas: cirka **8,60094 ljusår** genom invers parallax. Detta är SIMBADs citerade Hipparcos-reduktion (2007A&A...474..653V), inte en ny Gaia-mätning.
+
+SIMBAD-positionerna är ICRS vid **J2000.0**, enligt [SIMBADs dokumentation](https://simbad.cds.unistra.fr/Pages/guide/ch15.htx). När det redan finns en verifierad Gaia DR3-post behålls dess astrometri och J2016.0, medan namn/alias kompletteras. Varje objekt visar sin egen epok. Ingen egenrörelsepropagering, omloppsmodell eller gemensam observationstid påstås; blandade statiska epoker innebär att små relativa separationer inte ska användas för vetenskaplig analys av dubbelstjärnor. Osäkerheten är särskilt betydelsefull för avlägsna Betelgeuse/Rigel.
+
+`data/known-stars-simbad.csv` är det sparade råsvaret. `data/known-stars-metadata.json` innehåller exakt fråga, hämtningstid, källa och SHA-256. `src/data/known-stars.json` är den genererade lokala baskatalogen. Reproducera från det sparade svaret med `python3 scripts/import-known-stars.py`; använd `--fetch` för en ny hämtning. G-magnitud, temperatur, färg och radie fylls inte med påhittade värden där kompletteringen saknar dem. Sirius ingår därför inte i G-magnitudrankningen utan källbelagt G-värde.
+
+### Identifierare och sökning
+
+Sökning omfattar namn, alias, Bayerbeteckningar, HIP, HD och Gaia. Gemener/versaler, accenter, mellanrum, skiljetecken, grekiska bokstäver och vanliga `alf`/`bet`-förkortningar normaliseras. Alternativa skrivningar byggs från samma källbelagda Bayeridentitet. Matchning sker inom varje alias, inte över godtyckliga aliasgränser.
+
+Dubbletter slås ihop endast genom verifierade katalogidentifierare, aldrig genom fuzzy namn eller närhet. Sirius A och B och Alpha Centauri A/B förblir olika objekt. Motstridiga komponentidentifierare i JSON-import avvisas. Sirius B läggs inte till som ett nytt kvalitetsgodkänt Gaia-objekt; den nuvarande kvalitetsgränsen bevaras. För 10k/100k tillkommer sju saknade objekt; Proxima och Barnard kompletteras utan dubbletter. Totalt visas 10 007 / 100 007 stjärnor plus solen.
+
+Namntäckningen är fortfarande begränsad till den verifierade baskatalogen; övriga Gaia-objekt kan sökas via sina Gaia-ID:n. Mer fullständig korsmatchning av hela katalogen återstår. Kamerakod och 3D-rendering har inte ändrats för denna korrigering.

@@ -1,0 +1,16 @@
+import {describe,it,expect} from 'vitest';
+import {readFileSync} from 'node:fs';
+import {catalog,knownStars,mergeCatalog,parseCatalog,type Star} from './catalog';
+import {decodeCatalog} from './binary';
+import {searchStars} from './search';
+import {distance} from '../math/coordinates';
+const sirius=()=>catalog.find(s=>s.id==='HIP 32349')!;
+describe('verified named-star supplement',()=>{
+ it('validates alias input instead of letting it break the search index',()=>{expect(()=>parseCatalog([{...sirius(),aliases:'Sirius'}])).toThrow();expect(()=>parseCatalog([{...sirius(),aliases:[null]}])).toThrow();expect(parseCatalog([{...sirius(),aliases:['Sirius']}])[0].aliases).toEqual(['Sirius']);});
+ it.each(['Sirius','sIrIuS','HIP 32349','hip32349','HD 48915','Alpha Canis Majoris','α CMa','ALF CMa','α CMa A'])('resolves %s to Sirius A',query=>{expect(searchStars(catalog,query,'name').map(s=>s.id)).toEqual(['HIP 32349']);});
+ it('uses measured parallax and documented ICRS epoch',()=>{expect(distance(sirius().position)).toBeCloseTo(8.60094,4);expect(sirius().epoch).toBe(2000);expect(sirius().parallax).toBe(379.21);expect(sirius().source).toContain('2007A&A...474..653V');});
+ it('keeps the ten baseline objects available even without Gaia',()=>{const merged=mergeCatalog([]);expect(merged).toHaveLength(10);expect(merged.some(s=>s.name==='Alpha Centauri A')).toBe(true);expect(merged.some(s=>s.name==='Alpha Centauri B')).toBe(true);expect(merged.some(s=>s.name==='Rigel')).toBe(true);});
+ it('never merges Sirius B or alpha Centauri components based on proximity/name',()=>{const b:Star={...sirius(),id:'Gaia DR3 2947050466531873024',name:'Sirius B',aliases:['HD 48915B']};const all=mergeCatalog([sirius(),b]);expect(all.filter(s=>s.name.startsWith('Sirius'))).toHaveLength(2);expect(searchStars(all,'Sirius B','name')[0].id).toBe(b.id);expect(searchStars(all,'Alpha Centauri B','name')[0].id).toBe('HIP 71681');expect(searchStars(all,'HD 128620','name')[0].id).toBe('HIP 71683');});
+ it('merges only verified identifiers and preserves Gaia coordinates/epoch',()=>{const p=knownStars.find(s=>s.name==='Proxima Centauri')!;const gaia={...p,epoch:2016,ra:217.4,aliases:[]};const all=mergeCatalog([{...p,id:'HIP 70890'},gaia,sirius(),{...sirius(),id:'HD 48915'}]);expect(all.filter(s=>s.id===p.id)).toHaveLength(1);expect(all.find(s=>s.id===p.id)?.epoch).toBe(2016);expect(searchStars(all,'HIP70890','name')[0].id).toBe(p.id);expect(all.filter(s=>s.name==='Sirius A')).toHaveLength(1);expect(()=>mergeCatalog([{...sirius(),aliases:['HIP 71681']}])).toThrow();});
+ it.each([10000,100000])('indexes all %s Gaia objects plus the named supplement once',count=>{const data=readFileSync(new URL(`../../public/catalog/gaia-${count}.bin`,import.meta.url));const gaia=decodeCatalog(data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength) as ArrayBuffer);const all=mergeCatalog(gaia);expect(all).toHaveLength(count+8);expect(new Set(all.map(s=>s.id)).size).toBe(all.length);expect(searchStars(all,'Sirius','distance')).toHaveLength(1);expect(searchStars(all,gaia.at(-1)!.id,'distance')[0].id).toBe(gaia.at(-1)!.id);expect(searchStars(all,'HIP 87937','name')[0].name).toBe('Barnards stjärna');});
+});

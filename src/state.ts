@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import {catalog,sun,type Star} from './data/catalog';
+import {catalog,mergeCatalog,type Star} from './data/catalog';
 import type {Vec3} from './math/coordinates';
 import {flightInput} from './navigation/flightInput';
 interface State {catalogStatus:string;catalogError:boolean;showOverview:boolean;
@@ -14,7 +14,7 @@ interface State {catalogStatus:string;catalogError:boolean;showOverview:boolean;
  telemetry:(position:Vec3,moving:boolean,forward?:Vec3,velocity?:Vec3,indicator?:State['indicator'])=>void;
  resetCatalog:()=>void;importStars:(stars:Star[])=>void;
 }
-export const useStore=create<State>((set)=>({catalogStatus:'Lokal startkatalog · 150 stjärnor',catalogError:false,showOverview:true,
+export const useStore=create<State>((set)=>({catalogStatus:`Lokal startkatalog · ${catalog.length-1} stjärnor`,catalogError:false,showOverview:true,
  journey:{active:false,progress:0,paused:false,remaining:0,arrived:false},duration:20,
  cancelRequest:0,aimRequest:0,stopRequest:0,showScale:false,showAxes:false,
  cancelTravel:()=>set(s=>({cancelRequest:s.cancelRequest+1})),aim:()=>set(s=>({aimRequest:s.aimRequest+1})),
@@ -28,5 +28,5 @@ export const useStore=create<State>((set)=>({catalogStatus:'Lokal startkatalog �
  setMode:mode=>{flightInput.clear();set({mode});},setSpeed:speed=>set({speed}),
  telemetry:(position,moving,forward,velocity,indicator)=>set(s=>({position,moving,forward:forward??s.forward,velocity:velocity??s.velocity,indicator:indicator??s.indicator})),
  resetCatalog:()=>set(s=>({stars:catalog,selected:'sun',journey:{...s.journey,paused:false},travel:{id:'sun',nonce:s.travel.nonce+1}})),
- importStars:stars=>set(s=>({stars:[sun,...stars],selected:'sun',journey:{...s.journey,paused:false},travel:{id:'sun',nonce:s.travel.nonce+1}})),
+ importStars:stars=>set(s=>({stars:mergeCatalog(stars),selected:'sun',journey:{...s.journey,paused:false},travel:{id:'sun',nonce:s.travel.nonce+1}})),
 }));

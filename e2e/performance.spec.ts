@@ -18,7 +18,7 @@ test('real 10k and 100k catalogs: frame time, memory, nearest search and load fa
    const start=performance.now();const nearest=searchStars(state.stars,'','nearby',state.position);const searchMs=performance.now()-start;
    const repeatStart=performance.now();searchStars(state.stars,'','nearby',state.position);const repeatedSearchMs=performance.now()-repeatStart;
    const memory=(performance as unknown as {memory?:{usedJSHeapSize:number}}).memory;
-   return {count:state.stars.length-1,samples:frames.length,medianFrameMs:frames[Math.floor(frames.length*.5)],p95FrameMs:frames[Math.floor(frames.length*.95)],drawCalls:renderMetrics.drawCalls,geometries:renderMetrics.geometries,jsHeapBytes:memory?.usedJSHeapSize??null,pointAttributeBytes:state.stars.length*32,nearestSearchMs:searchMs,repeatedSearchMs,nearest:nearest[0].id};
+   return {count:state.stars.filter((s:{id:string})=>s.id.startsWith('Gaia DR3 ')).length,totalStars:state.stars.length-1,samples:frames.length,medianFrameMs:frames[Math.floor(frames.length*.5)],p95FrameMs:frames[Math.floor(frames.length*.95)],drawCalls:renderMetrics.drawCalls,geometries:renderMetrics.geometries,jsHeapBytes:memory?.usedJSHeapSize??null,pointAttributeBytes:state.stars.length*32,nearestSearchMs:searchMs,repeatedSearchMs,nearest:nearest[0].id};
   }));
   expect(reports.at(-1)!.count).toBe(count);expect(reports.at(-1)!.drawCalls).toBeLessThan(20);expect(reports.at(-1)!.samples).toBeGreaterThan(5);
  }
@@ -28,7 +28,7 @@ test('real 10k and 100k catalogs: frame time, memory, nearest search and load fa
  // Worker requests do not pass page routes; block at browser context level.
  await page.context().route('**/catalog/gaia-10000.bin',route=>route.fulfill({status:503,body:'Unavailable'}));
  await page.getByRole('button',{name:'Ladda om katalog'}).click();await expect(page.locator('.catalog-status')).toContainText('kunde inte laddas',{timeout:20000});
- await expect(page.locator('footer')).toContainText('100000 STJÄRNOR');
+ await expect(page.locator('footer')).toContainText('100007 STJÄRNOR');
  expect(errors).toEqual([]);expect(shaderErrors).toEqual([]);
  writeFileSync('work/performance.json',JSON.stringify({environment:'Headless Chrome, SwiftShader, 1280x720, DPR 1, static initial view; frame intervals, not GPU timestamps; JS heap after GC; CPU nearest search',reports},null,2));
 });

@@ -1,6 +1,8 @@
+import knownRaw from './known-stars.json';
+import {normalizeName} from './identity';
 import raw from './stars.json';
 import {position,type Vec3} from '../math/coordinates';
-export interface Star {radiusSolar?:number|null;radiusSource?:string;temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
+export interface Star {aliases?:string[];sourceUrl?:string;componentNote?:string;radiusSolar?:number|null;radiusSource?:string;temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
 export function parseCatalog(input:unknown):Star[]{
  if(!Array.isArray(input)||input.length===0||input.length>100000)throw new Error('Katalogen måste innehålla 1–100000 stjärnor.');
  const ids=new Set<string>();
@@ -14,8 +16,32 @@ export function parseCatalog(input:unknown):Star[]{
   if(s.parallaxError!==null&&(s.parallaxError as number)<0)throw new Error('Osäkerhet får inte vara negativ.');
   if(s.temperature!==undefined&&s.temperature!==null&&(typeof s.temperature!=='number'||!Number.isFinite(s.temperature)||s.temperature<=0))throw new Error('Ogiltig temperatur');
   if(s.radiusSolar!=null&&(typeof s.radiusSolar!=='number'||!Number.isFinite(s.radiusSolar)||s.radiusSolar<=0||typeof s.radiusSource!=='string'||!s.radiusSource.trim()))throw new Error('Radie kräver positivt värde och källa');
+  if(s.aliases!==undefined&&(!Array.isArray(s.aliases)||s.aliases.length>200||!s.aliases.every(a=>typeof a==='string'&&a.trim()&&a.length<=160)))throw new Error('Alias måste vara en lista med högst 200 namn.');
+  for(const key of ['sourceUrl','componentNote'])if(s[key]!==undefined&&typeof s[key]!=='string')throw new Error('Ogiltig källinformation');
+  if(s.sourceUrl!==undefined&&!/^https?:\/\//i.test(s.sourceUrl as string))throw new Error('Källänk måste vara http eller https');
   ids.add(s.id);const star=s as unknown as Star;return {...star,position:position(star.ra,star.dec,star.parallax)};
  });
 }
-export const sun:Star={id:'sun',name:'Solen',ra:0,dec:0,parallax:0,parallaxError:null,mag:null,bpRp:null,epoch:2016,source:'Koordinatsystemets ursprung (approximation av solsystemets barycentrum)',position:[0,0,0]};
-export const catalog=[sun,...parseCatalog(raw)];
+export const sun:Star={id:'sun',name:'Solen',aliases:['Sun','Sol'],ra:0,dec:0,parallax:0,parallaxError:null,mag:null,bpRp:null,epoch:2016,source:'Koordinatsystemets ursprung (approximation av solsystemets barycentrum)',position:[0,0,0]};
+export const knownStars=parseCatalog(knownRaw);
+const identities=new Map<string,Star>();
+for(const star of knownStars)for(const id of [star.id,...star.aliases??[]]){
+ // Only source-verified catalog identifiers are merge keys, never position or fuzzy names.
+ if(/^(HIP|HD|Gaia DR[23])\s/i.test(id))identities.set(normalizeName(id),star);
+}
+export function mergeCatalog(input:Star[]):Star[]{
+ const merged=new Map<string,Star>();
+ for(const star of input){
+  if(star.id==='sun')continue;
+  const matches=new Set([star.id,...star.aliases??[]].map(id=>identities.get(normalizeName(id))).filter(Boolean));
+  if(matches.size>1)throw new Error('Motstridiga katalogidentifierare för flera stjärnkomponenter.');
+  const known=[...matches][0];
+  const item=known?{...star,id:known.id,name:known.name,aliases:[...new Set([star.id,...known.aliases??[],...star.aliases??[]])],sourceUrl:known.sourceUrl,componentNote:known.componentNote}:star;
+  // Prefer the canonical Gaia entry if a supplemental HIP row is also imported.
+  const prior=merged.get(item.id);
+  if(!prior||star.id===item.id)merged.set(item.id,item);
+ }
+ for(const star of knownStars)if(!merged.has(star.id))merged.set(star.id,star);
+ return [sun,...merged.values()];
+}
+export const catalog=mergeCatalog(parseCatalog(raw));

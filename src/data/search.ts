@@ -1,9 +1,9 @@
+import {normalizeName} from './identity';
 import type {Star} from './catalog';
 import type {Vec3} from '../math/coordinates';
 export type SortOrder='distance'|'name'|'nearby';
 export const PAGE_SIZE=50;
-const normalize=(text:string)=>text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-const names=new WeakMap<Star,string>();
+const names=new WeakMap<Star,string[]>();
 const catalogs=new WeakMap<Star[],Partial<Record<SortOrder,{origin:string;stars:Star[]}>>>();
 const collator=new Intl.Collator('sv');
 // Catalog arrays and their stars are immutable; replacement naturally invalidates this cache.
@@ -18,7 +18,7 @@ export function searchStars(stars:Star[],query:string,order:SortOrder,origin:Vec
     .sort((a,b)=>a.d-b.d).map(item=>item.star);
   sorted={origin:key,stars:result};cache[order]=sorted;
  }
- const text=normalize(query);
+ const text=normalizeName(query);
  // Return a fresh result: callers may sort or otherwise modify their search results.
- return sorted.stars.filter(star=>{if(!text)return true;let name=names.get(star);if(name===undefined){name=normalize(`${star.name} ${star.id}`);names.set(star,name);}return name.includes(text);});
+ return sorted.stars.filter(star=>{if(!text)return true;let name=names.get(star);if(name===undefined){name=[star.name,star.id,...star.aliases??[]].map(normalizeName);names.set(star,name);}return name.some(alias=>alias.includes(text));});
 }

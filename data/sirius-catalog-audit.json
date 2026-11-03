@@ -1,0 +1,79 @@
+{
+  "checked": "2026-11-03T07:38:47.276971+00:00",
+  "endpoint": "https://gaia.ari.uni-heidelberg.de/tap/sync",
+  "query": "SELECT source_id,ra,dec,parallax,parallax_over_error,ruwe,phot_g_mean_mag FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',101.2871553333,-16.7161158611,0.0166667))",
+  "rows": [
+    {
+      "source_id": "2947050260368847616",
+      "ra": "101.29298121878419",
+      "dec": "-16.73173035325023",
+      "parallax": "0.16801269908224134",
+      "parallax_over_error": "2.7243927",
+      "ruwe": "1.0514861",
+      "phot_g_mean_mag": "15.85727"
+    },
+    {
+      "source_id": "2947050603973764864",
+      "ra": "101.30017883653288",
+      "dec": "-16.705895967804206",
+      "parallax": "",
+      "parallax_over_error": "",
+      "ruwe": "",
+      "phot_g_mean_mag": "17.024605"
+    },
+    {
+      "source_id": "2947050466531873024",
+      "ra": "101.28662552099249",
+      "dec": "-16.720932526023173",
+      "parallax": "374.48958852876103",
+      "parallax_over_error": "1618.8214",
+      "ruwe": "2.4190555",
+      "phot_g_mean_mag": "8.524133"
+    },
+    {
+      "source_id": "2947050535251345664",
+      "ra": "101.27658947044938",
+      "dec": "-16.709500465271162",
+      "parallax": "",
+      "parallax_over_error": "",
+      "ruwe": "",
+      "phot_g_mean_mag": "16.917519"
+    },
+    {
+      "source_id": "2947050535251579904",
+      "ra": "101.27777010659342",
+      "dec": "-16.715318709380163",
+      "parallax": "",
+      "parallax_over_error": "",
+      "ruwe": "",
+      "phot_g_mean_mag": "16.339106"
+    },
+    {
+      "source_id": "2947050466531872640",
+      "ra": "101.29146384626932",
+      "dec": "-16.722798831098476",
+      "parallax": "",
+      "parallax_over_error": "",
+      "ruwe": "",
+      "phot_g_mean_mag": "15.726074"
+    },
+    {
+      "source_id": "2947050466534535168",
+      "ra": "101.28073963347308",
+      "dec": "-16.728306280185876",
+      "parallax": "",
+      "parallax_over_error": "",
+      "ruwe": "",
+      "phot_g_mean_mag": "16.981663"
+    }
+  ],
+  "localNearestArcsec": 739.2634549644714,
+  "localNearestId": "2947071425961581184",
+  "siriusB": "2947050466531873024",
+  "siriusBRuwe": 2.4190555,
+  "notes": [
+    "SIMBAD identifies HIP 32349 / HD 48915 with Sirius A and provides no Gaia DR3 cross-ID for A.",
+    "SIMBAD identifies Gaia DR3 2947050466531873024 with Sirius B, not A. Its RUWE exceeds the local import cut of 1.4.",
+    "No unambiguous Sirius A source identified in the unfiltered Gaia cone. Absence is not repaired with a positional guess."
+  ]
+}

@@ -1,5 +1,5 @@
 import {useStore} from '../state';
-import {sun,type Star} from './catalog';
+import {mergeCatalog,type Star} from './catalog';
 let worker:Worker|undefined;
 export function cancelCatalogLoad(){worker?.terminate();worker=undefined;}
 export function loadCatalog(count:10000|100000){
@@ -10,10 +10,10 @@ export function loadCatalog(count:10000|100000){
  current.onerror=()=>fail('Katalogdata kunde inte laddas. Befintliga stjärnor behålls.');
  current.onmessage=(event:MessageEvent<{stars?:Star[];error?:string}>)=>{
   if(event.data.error){fail(event.data.error);return;}
-  const stars=[sun,...event.data.stars!],state=useStore.getState();
+  const stars=mergeCatalog(event.data.stars!),state=useStore.getState();
   const selected=stars.some(star=>star.id===state.selected)?state.selected:'sun';
   const activeTarget=stars.some(star=>star.id===state.travel.id);
-  useStore.setState({stars,selected,catalogStatus:`${stars.length-1} Gaia DR3-stjärnor`,catalogError:false,...(!activeTarget?{cancelRequest:state.cancelRequest+1}:{})});
+  useStore.setState({stars,selected,catalogStatus:`${event.data.stars!.length} Gaia DR3-stjärnor + ${stars.length-event.data.stars!.length-1} kompletterande stjärnor`,catalogError:false,...(!activeTarget?{cancelRequest:state.cancelRequest+1}:{})});
   current.terminate();
  };
  current.postMessage({count});

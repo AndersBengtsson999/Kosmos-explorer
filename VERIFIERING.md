@@ -2,7 +2,17 @@
 
 ## Resultat
 
-59 av 59 enhetstester och 6 av 6 Chrome-scenarier passerar. TypeScript och Vite-produktionsbygget passerar. Desktop-närbild och mobilens Upptäck-panel har granskats visuellt. Kamera, paus, återupptagning, fri blick, avbrott, lägesbyten och lokal rotation ingår i kontrollen.
+75 av 75 enhetstester och 8 av 8 Chrome-scenarier passerar. TypeScript och Vite-produktionsbygget passerar. Desktop-närbild och mobilens Upptäck-panel har granskats visuellt. Kamera, paus, återupptagning, fri blick, avbrott, lägesbyten och lokal rotation ingår i kontrollen.
+
+## Senaste korrigering: Sirius och baskatalogen
+
+Sirius A saknades i Gaia-urvalet; endast Proxima/Barnard hade vanliga namn och alias indexerades inte. Ofiltrerad Gaia-fråga och SIMBAD-korsidentifierare skiljer A från B. Sirius B (Gaia DR3 2947050466531873024) har RUWE 2,4190555 och passerar inte importgränsen 1,4. Sökningen omfattade redan alla inlästa objekt; problemet var datatäckning och namn/alias.
+
+Nio SIMBAD-källbelagda stjärnor plus solen bildar en permanent baskatalog. Sju tillkommer i 10k/100k; Proxima/Barnard kompletteras utan dubbletter. Sirius A ligger 8,60094 ljusår bort enligt parallax 379,21 ± 1,58 mas. HIP/HD/Gaia-identiteter används för dubblettkontroll, aldrig närhet. Alpha Centauri A/B och Sirius A/B hålls separata. Grekiska Bayerbokstäver, alf/bet, skiftläge, accenter och separatorer normaliseras. Kända stjärnor finns även vid nätfel och egen import.
+
+Nya tester täcker nio Sirius-sökvarianter, avstånd/epok, hela 10k/100k-indexet, dubbletter, komponenter, motstridiga alias, Gaia-prioritet, resa till Sirius och nätfel. Alla tidigare navigeringsscenarier passerar. Kamera och rendering är oförändrade. Baskatalogen har återskapats från sparad CSV utan nätåtkomst. Närbild av Sirius har granskats.
+
+Källunderlag: data/known-stars-simbad.csv, known-stars-metadata.json och sirius-catalog-audit.json. Se README för referenser och reproduktionskommandon. SIMBAD-positioner är ICRS/J2000.0, bevarade Gaia-positioner J2016.0; ingen egenrörelsepropagering görs. Övriga kända namn utanför baskatalogen återstår att korsmatcha. Okända G-magnituder/radier fylls inte med antagna mätvärden.
 
 ## Funktioner och data
 
@@ -18,8 +28,8 @@ Chrome/SwiftShader, 1280 × 720, DPR 1, statisk standardvy, cirka fem sekunder p
 
 | Källor | Median bildruta | P95 | JS-heap | GPU-punktattribut | Närsökning | Upprepad |
 |---:|---:|---:|---:|---:|---:|---:|
-| 10 000 | 29,8 ms | 34,7 ms | 45,0 MB | 0,32 MB | 2,8 ms | 0,1 ms |
-| 100 000 | 55,7 ms | 59,3 ms | 90,9 MB | 3,20 MB | 44,4 ms | 0,7 ms |
+| 10 000 + 7 | 31.7 ms | 42.5 ms | 45.6 MB | 0.32 MB | 3.3 ms | 0.1 ms |
+| 100 000 + 7 | 57.3 ms | 65.6 ms | 90.4 MB | 3.20 MB | 47.1 ms | 0.6 ms |
 
 Två ritningsanrop i standardvyn. JS-heap mäts efter begärd garbage collection och är inte total processminne; attributmåttet inkluderar inte drivrutin eller framebuffer. Närbilder kräver ytterligare geometri/anrop när de visas. Hårdvaru-GPU, Safari och fysisk mobil är inte verifierade. Rådata och tidigare körningar finns i PERFORMANCE.json.
 

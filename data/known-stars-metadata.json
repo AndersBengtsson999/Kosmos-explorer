@@ -1,0 +1,9 @@
+{
+  "endpoint": "https://simbad.harvard.edu/simbad/sim-tap/sync",
+  "query": "SELECT b.main_id,b.ra,b.dec,b.plx_value,b.plx_err,b.coo_bibcode,b.plx_bibcode,i.ids FROM basic b JOIN ident n ON b.oid=n.oidref JOIN ids i ON b.oid=i.oidref WHERE n.id IN ('HIP 32349','HIP 71683','HIP 71681','HIP 91262','HIP 69673','HIP 27989','HIP 24436','HIP 70890','HIP 87937')",
+  "retrieved": "2026-11-03T07:34:11.340628+00:00",
+  "sha256": "bf59e38ab97c9db5c90602b29b8d3ffcfc679a224248e7c9699199e6725ac9ef",
+  "frame": "ICRS",
+  "epoch": 2000.0,
+  "coordinateReference": "https://simbad.cds.unistra.fr/Pages/guide/ch15.htx"
+}
