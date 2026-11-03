@@ -1,0 +1,10 @@
+{
+  "horizons": "https://ssd.jpl.nasa.gov/api/horizons.api",
+  "epoch": "2026-11-03 TDB",
+  "center": "500@10",
+  "plane": "Ecliptic J2000",
+  "exoQuery": "select pl_name,hostname,ra,dec,sy_plx,pl_rade,pl_bmasse,pl_bmassprov,pl_orbper,pl_orbsmax,pl_orbeccen,pl_orbincl from pscomppars where hostname='TRAPPIST-1' or pl_name like 'Proxima%'",
+  "exoEndpoint": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+  "retrieved": "2026-11-03",
+  "exoStatus": "Downloaded successfully; not yet integrated into the 0.6 solar-system milestone."
+}

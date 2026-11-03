@@ -227,3 +227,20 @@ Vid ankomst ligger stoppunkten utanför ytan. `arrivalDistance` och kamerastyrni
 Knapparna ligger på en egen rad. I rymdskeppsläge döljs manöverpanelen medan ankomstkortet visas för att undvika överlappning; stäng kortet för att visa den igen. Tangentbordsstyrningen påverkas inte. Vetenskapligt detaljerade axelkoordinater är fortfarande separata från de automatiskt anpassade avstånden.
 
 På desktop ersätter ankomstkortet tillfälligt informationspanelen till höger, så att stjärnan förblir fri i mitten. Stäng kortet eller välj en annan stjärna för att återgå till informationspanelen. På mobil ligger kortet vid skärmens nederkant.
+
+## 0.6 – solsystemets första planetsystemvy
+
+Välj Solen och **Utforska planetsystem** (tillgänglig även utan att först resa till solen). Åtta planeter kan väljas, undersökas och besökas med 10/20/40/60 sekunders resa. Återgång behåller stjärnkartans position och orientering. Lokal vy använder AU och en separat kamera; stjärnkamerans enda befintliga ägare är inaktiv under utforskningen. Övergången tonas in; det är ett skalbyte, inte en sammanhängande fysisk zoom.
+
+Planeternas sanna radier är standard. Pedagogisk visning förstorar små planeter till minst 0,025 AU utan att ändra banor eller data. Ankomst och kollisionsskydd använder den visade radien och kamerans smalaste synfält. Tiden pausas vid planetresa och startas manuellt igen. Under resan kan man pausa eller avbryta; efteråt går det att rotera, panorera och zooma. Stjärnresornas fria blick är oförändrad, men planetresor har för närvarande låst blick under själva färden.
+
+### Planetkällor och reproduktion
+
+- `python3 scripts/import-planets.py` bygger lokala data från de åtta sparade JPL Horizons-svaren i `data/planets`. `--fetch` hämtar samma epok sekventiellt igen. Importen kontrollerar API-version 1.2 och referensplan, läser volymmedelradie, massa och den första raden med banelement, och sparar SHA-256 för varje råsvar.
+- [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/): heliocentriska oskulerande element vid **2026-11-03 00:00 TDB**, JD 2461347,5; ekliptika J2000.0, AU/dygn/grader. Rendering `(X,Z,-Y)` är lokal ekliptika, skild från stjärnkartans ICRS. Ingen implicit omvandling av stjärnpositioner sker vid skalbytet.
+- Keplers ekvation löses iterativt. Fasta element propageras i en tvåkroppsmodell, utan planetstörningar eller månar. Detta är en pedagogisk approximation nära elementepoken, inte en navigeringsefemerid. Omloppstiden som visas är det oskulerande Horizons-värdet.
+- [NASA/JPL:s planetkartor](https://space.jpl.nasa.gov/tmaps/) är historiska kartor/mosaiker/representativa molnkartor. Jordens karta är topografisk, inte ett fotografi. Exakta URL:er finns i `data/planets/textures.json`. `python3 scripts/import-planet-textures.py` hämtar kartorna igen från projektroten. Ingen verklig rotationsfas, axellutning eller ljussättning hävdas: sfärerna har jämn belysning och illustrativ texturorientering. Saturnus ringar är ännu inte modellerade.
+
+### Avgränsning i denna leverans
+
+Solsystemet är implementerat. Generella `Planet`/`PlanetSystem`-modeller separerar data, banmatematik, tid, kamera och gränssnitt. **TRAPPIST-1 och Proxima har ännu ingen lokal planetsystemvy.** NASA Exoplanet Archives bekräftade `pscomppars`-rader har hämtats och sparats i `data/planets/exoplanets.json`; den fungerande frågan finns i `requests.json`. De används inte i renderingen förrän värdstjärnornas korsreferenser, okända banfaser/orienteringar och varje mätnings härkomst hanteras fullt ut. Saknade värden visas som ”Okänt”; generell reservradie är illustrativ och ska märkas innan fler system aktiveras. Den befintliga Proxima-informationen i stjärnkatalogen är bevarad.

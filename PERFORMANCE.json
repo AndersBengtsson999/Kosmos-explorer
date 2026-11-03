@@ -124,5 +124,38 @@
       "comparisonNote": "Separate runs on the same configured SwiftShader environment, not an isolated controlled A/B benchmark; machine load can vary."
     },
     "comparisonNote": "Separate runs, not a controlled A/B comparison. Shader point attributes are now 32 bytes per star including the fade index."
+  },
+  "solarSystem06": {
+    "environment": "Headless Chrome, SwiftShader, 1280x720, DPR 1, static initial view; frame intervals, not GPU timestamps; JS heap after GC; CPU nearest search",
+    "reports": [
+      {
+        "count": 10000,
+        "totalStars": 10007,
+        "samples": 140,
+        "medianFrameMs": 34,
+        "p95FrameMs": 39.800000071525574,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 35771765,
+        "pointAttributeBytes": 320256,
+        "nearestSearchMs": 2.899999976158142,
+        "repeatedSearchMs": 0,
+        "nearest": "Gaia DR3 1838855376946302720"
+      },
+      {
+        "count": 100000,
+        "totalStars": 100007,
+        "samples": 86,
+        "medianFrameMs": 57.60000002384186,
+        "p95FrameMs": 64.80000007152557,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 95402179,
+        "pointAttributeBytes": 3200256,
+        "nearestSearchMs": 46.60000002384186,
+        "repeatedSearchMs": 0.7999999523162842,
+        "nearest": "Gaia DR3 1838855376946302720"
+      }
+    ]
   }
 }

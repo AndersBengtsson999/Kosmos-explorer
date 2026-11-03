@@ -1,3 +1,15 @@
+# Cosmos Explorer 0.6 – solsystemleverans, 2026-11-03
+
+83 av 83 enhetstester, 9 av 9 Chrome-scenarier och produktionsbygget passerar. Den slutliga webbläsaromgången tog 1,5 minut. Testerna omfattar åtta källbelagda planeter, värdstjärnans identitet, Keplerbanornas period och avståndsgränser, tidskontroll, okända värden, fysisk radie, upprepade resor och orientering. Webbläsaren verifierar resa till Jorden, paus/återupptagning, mobil återgång, bevarad stjärnkamera (tolerans 1e-10), återöppning och avbruten resa till Mars. Samtliga tidigare stjärnscenarier passerar, inklusive Sirius och 100k-katalogen.
+
+Desktop och mobil närbild granskades visuellt. Under utvecklingen rättades en skrollad tillbaka-knapp och ett DOM-fel i etikettportaler; etiketter använder nu vanliga skärmöverlägg med överlappningskontroll. En testkörning kunde inte starta Chrome; den slutliga kompletta omkörningen passerade. Importen återskapades från sparade Horizons-svar.
+
+**Leveransen omfattar solsystemet.** TRAPPIST-1/Proximas lokala vyer återstår. Nio bekräftade exoplanetrader från NASA Exoplanet Archive sparas endast som underlag. Keplerbanor är tvåkroppsapproximationer vid JPL-epoken 2026-11-03 TDB. Planetkartornas orientering och belysning är illustrativa; Jordens karta är topografisk. Saturnus ringar, fysisk rotation och störningar från andra kroppar ingår inte. Planetresans blick är låst; stjärnresans fria blick finns kvar.
+
+Stjärnkartans senaste SwiftShader-kontroll (1280×720, DPR 1, efter GC): 10k median 34,0 ms / P95 39,8 ms / JS-heap 35,8 MB; 100k median 57,6 ms / P95 64,8 ms / JS-heap 95,4 MB. Två draw calls i båda fallen. Detta är bildruteintervall i mjukvarurendering, inte hårdvaru-GPU-tid och inte prestandamätning av planetsystemvyn. Mätningen finns i PERFORMANCE.json under solarSystem06. Bygget varnar fortsatt för en stor JS-fil, cirka 1,24 MB (352 kB gzip).
+
+---
+
 # Cosmos Explorer 0.5 – verifiering 2026-11-03
 
 ## Resultat

@@ -1,3 +1,4 @@
+import {usePlanetStore} from '../planets/state';
 import {spatialCatalog} from '../data/spatial';
 import {arrivalDistance,radiusInfo} from '../math/stellar';
 import {useEffect, useRef,useMemo} from 'react';
@@ -68,6 +69,7 @@ export function Navigation() {
     let pointer: number | null = null;
     let lastX = 0, lastY = 0;
     const down = (event: KeyboardEvent) => {
+      if(usePlanetStore.getState().host)return;
       if (event.code === 'Space' && !(event.target instanceof Element && event.target.closest('input,select,textarea,button'))) { event.preventDefault();useStore.getState().stop();return; }
       if (event.code === 'Escape') { cancel(); return; }
       if (useStore.getState().mode !== 'ship' || !flightCodes.has(event.code)) return;
@@ -128,6 +130,7 @@ export function Navigation() {
     const state = useStore.getState();
     const orbit = controls.current;
     if (!orbit) return;
+    if(usePlanetStore.getState().host){orbit.enabled=false;flightInput.clear();skipDelta.current=true;return;}
     if (state.mode !== previousMode.current) {
       if (!journey.current.active && !aim.current.active) syncOrbit();
       previousMode.current = state.mode;
