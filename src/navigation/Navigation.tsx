@@ -1,4 +1,6 @@
-import {useEffect, useRef} from 'react';
+import {spatialCatalog} from '../data/spatial';
+import {arrivalDistance,radiusInfo} from '../math/stellar';
+import {useEffect, useRef,useMemo} from 'react';
 import {useFrame, useThree} from '@react-three/fiber';
 import {Euler, PerspectiveCamera, Vector3} from 'three';
 import {OrbitControls} from 'three-stdlib';
@@ -13,6 +15,7 @@ import {ARRIVAL_DISTANCE, CameraJourney} from './CameraJourney';
 export function Navigation() {
   const {camera: sceneCamera, gl} = useThree();
   const camera = sceneCamera as PerspectiveCamera;
+  const stars=useStore(s=>s.stars),spatial=useMemo(()=>spatialCatalog(stars),[stars]);
   const controls = useRef<OrbitControls | null>(null);
   const journey = useRef(new CameraJourney());
   const aim=useRef(new CameraAim());
@@ -22,6 +25,7 @@ export function Navigation() {
   const seenCancel = useRef(0);
   const previousMode = useRef(useStore.getState().mode);
   const tick = useRef(0);
+  const focusDistance=useRef(ARRIVAL_DISTANCE);
   const skipDelta=useRef(false);
 
   // Hand off a pose without retaining old orbit inertia or changing its viewing direction.
@@ -36,7 +40,7 @@ export function Navigation() {
     camera.quaternion.copy(rotation);
     camera.up.set(0, 1, 0).applyQuaternion(rotation);
     orbit.target.copy(target ?? camera.getWorldDirection(new Vector3())
-      .multiplyScalar(ARRIVAL_DISTANCE).add(position));
+      .multiplyScalar(focusDistance.current).add(position));
     orbit.update();
     camera.position.copy(position);
     camera.quaternion.copy(rotation);
@@ -45,6 +49,7 @@ export function Navigation() {
 
   function cancel() {
     if (!journey.current.active) return;
+    focusDistance.current=Math.max(1e-10,camera.position.distanceTo(journey.current.target));
     journey.current.cancel();
     aim.current.cancel();
     syncOrbit();
@@ -56,7 +61,7 @@ export function Navigation() {
     const orbit = new OrbitControls(camera, gl.domElement);
     orbit.enableDamping = true;
     orbit.dampingFactor = 0.08;
-    orbit.minDistance = 0.3;
+    orbit.minDistance = 1e-10;
     orbit.maxDistance = 100000;
     controls.current = orbit;
     syncOrbit();
@@ -133,7 +138,8 @@ export function Navigation() {
       if (star) {
         flightInput.clear();
         orbit.enabled = false;
-        journey.current.start(camera, new Vector3(...star.position),state.duration);
+        journey.current.start(camera, new Vector3(...star.position),state.duration,arrivalDistance(radiusInfo(star).ly,camera.fov,camera.aspect));
+        focusDistance.current=arrivalDistance(radiusInfo(star).ly,camera.fov,camera.aspect);
         aim.current.start(camera,journey.current.target);
         state.setJourney(true, 0,journey.current.remaining(camera));
       }
@@ -172,6 +178,8 @@ export function Navigation() {
     const wasAiming=aim.current.active;
     aim.current.step(camera,dt);
     if(wasAiming&&!aim.current.active&&!journey.current.active)syncOrbit();
+    // Keep each rendered camera pose outside nearby stellar surfaces.
+    camera.position.fromArray(spatial.outside(camera.position.toArray(),camera.getWorldDirection(new Vector3()).negate().toArray()));
     const velocity=camera.position.clone().sub(lastPosition.current).divideScalar(delta||1);
     if(state.mode==='map'&&!journey.current.active)velocity.set(0,0,0);
     lastPosition.current.copy(camera.position);

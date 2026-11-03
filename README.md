@@ -159,3 +159,26 @@ Se `PERFORMANCE.json` och `VERIFIERING.md` för uppmätta resultat. Testerna anv
 ### Fortsatt optimering
 
 Kartläget gör inte längre dolda HUD-sökningar i hela katalogen. Destinationslinjen återanvänder sin grafikbuffert och sökning återanvänder katalogens sortering. Närpositionens cache ersätts när utgångspunkten ändras. Kataloger behandlas som oföränderliga; import skapar en ny array. Resor och kamerastyrning är oförändrade. Aktuella mätvärden och tidigare separata körning finns i `PERFORMANCE.json`; 46 enhetstester och fem webbläsarscenarier passerar.
+
+
+## Version 0.5 – Upptäck och närankomster
+
+**Upptäck** visar högst tio poster per sida: närmast solen, skenbart ljusstarkast i Gaia G-bandet, bekräftade planetvärdar, dokumenterad radie, effektiv temperatur och närmast vald kameraposition. Närsökningen är en ögonblicksbild som uppdateras med knappen. `Visa` markerar stjärnan; `Res dit` använder samma resefunktion och valda restid som övriga appen. Urvalet gäller den inlästa katalogen, inte hela himlen. Solen undantas från upptäcktslistorna.
+
+Gaia DR3-positioner, magnituder och GSP-Phot-temperaturer återanvänds oförändrade. Planetkategorin är ett begränsat NASA-belagt urval, Proxima b/d, inte en komplett inventering. Medföljande Gaia-uttag innehåller **inga stjärnradier**, och Största-kategorin visar därför tydligt att uppgifter saknas. JSON-import accepterar valfria `radiusSolar` och `radiusSource`; positiv ändlig radie och källa krävs tillsammans. Importerade uppgifter är användarens källbelagda data, inte automatiskt vetenskapligt verifierade av appen.
+
+### Storlek, färg och ankomst
+
+En solradie är den nominella IAU-konstanten 6,957 × 10⁸ m enligt [IAU 2015 resolution B3](https://www.iau.org/common/Uploaded%20files/IAUGA2015-Resolution-B3-recommended-nominal-conversion.pdf), dividerad med 9,4607304725808 × 10¹⁵ m per julianskt ljusår. För solen används den nominella solradien. När en stjärnas radie saknas används **illustrativ 1 solradie**; detta märks i informationspanelen och ankomstmeddelandet och lagras inte som ett astronomiskt mätvärde.
+
+Vinkeldiameter = 2 asin(radien / centrumavståndet). Ankomstavståndet väljs så att stjärnans vinkeldiameter upptar 44 procent av det smalare synfältet, beräknat vid resans start. Kameran stannar utanför ytan. En mjuk övertoning mellan punkt och sfär sker över 0,0004–0,0024 radianer. Punkternas minsta bildskärmsstorlek är fortfarande symbolisk. Sfär, ytstruktur, randmörkning och svag korona är illustrationer, inte observerade ytdata. Färgen är schematisk från temperatur, annars BP−RP; den är inte ett kalibrerat spektrum.
+
+Resan använder samma CameraJourney/CameraAim och en femtegradig mjuk start/stopp-profil. För nära ankomster interpoleras logaritmen av avståndet, så att stjärnan växer under en märkbar del av resan i stället för endast sista bildrutan. Tiden är fortfarande 10/20/40/60 sekunder. Paus, återupptagning, avbrott och fri blick bevaras. Manuellt ändrad blick återställs inte vid ankomst; använd Rikta mot destination. Färden är en visuell övergång, inte en fysikalisk eller relativistisk flygsimulering.
+
+Närbilder beräknas relativt kameran i float64 innan GPU-rendering i radieenheter. Detta undviker bortfall av en liten sfär genom subtraktion av stora float32-koordinater. Ett cachelagrat rumsindex med en ljusår stora celler hittar närliggande objekt. Högst åtta närbilder skapas samtidigt; övriga stjärnor förblir GPU-punkter. Ett lokalt ytskydd håller varje visad kameraposition utanför stjärnans radie med fem procents marginal. Skyddet är ingen kontinuerlig kollisions- eller hinderundvikande banplanerare; mycket snabb manuell förflyttning kan passera förbi en stjärna mellan bildrutor. Fysiskt överlappande stjärnor i egen importerad data stöds inte som en kollisionssimulering.
+
+### Begränsningar och tester
+
+Radieunderlaget och planetvärdarna är ofullständiga och framgår i gränssnittet. Varken temperaturer eller radier hittas på. Åtta samtidiga sfärer är en medveten detaljgräns; ingen fullskalig yt-/planet-/systemmodell ingår. Äldre uppgifter om tre ljusårs ankomst ovan beskriver tidigare versioner och har ersatts av den radieanpassade modellen.
+
+Testerna omfattar sortering, filtrering, saknade värden, importvalidering, vinkelstorlek, övertoningskurva, radie/synfält, precisionssäker siktning, närindex och ytskydd samt resor, paus och avbrott. Webbläsartester inkluderar Upptäck, närankomst, lokal rotation, mobil och verkliga 10k/100k-kataloger. Se VERIFIERING.md för senaste körningen och mätvärden.

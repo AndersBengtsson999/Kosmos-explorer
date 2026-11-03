@@ -23,15 +23,15 @@ test('20 second default, pause, free look, resume and cancellation',async({page}
  expect(errors).toEqual([]);
 });
 
-test('10 second arrival and aim leave the camera at three light years',async({page})=>{
+test('10 second arrival fits the stellar radius and preserves aiming',async({page})=>{
  await page.goto('/');await select(page,'Barnards');await page.getByRole('combobox',{name:'Restid'}).selectOption('10');
  const started=Date.now();await page.getByRole('button',{name:'Res till stjärnan'}).click();
  await expect(page.getByRole('region',{name:'Pågående resa'})).toBeVisible();
  await expect(page.locator('.arrival-notice')).toBeVisible({timeout:25000});expect(Date.now()-started).toBeGreaterThan(9000);
  const target=await page.evaluate(async()=>{const path='/src/data/catalog.ts';const {catalog}=await import(path);return catalog.find((s:{name:string})=>s.name==='Barnards stjärna').position as number[];});
- const arrived=await pose(page);expect(gap(arrived.position,target)).toBeCloseTo(3,5);
+ const arrived=await pose(page);const expected=await page.evaluate(async()=>{const path="/src/math/stellar.ts";const {arrivalDistance,SOLAR_RADIUS_LY}=await import(path);return arrivalDistance(SOLAR_RADIUS_LY,55,1280/720);});expect(Math.abs(gap(arrived.position,target)/expected-1)).toBeLessThan(.00001);
  const [x,y,z,w]=arrived.quaternion;const forward=[-2*(x*z+w*y),-2*(y*z-w*x),-(1-2*(x*x+y*y))];
- expect(forward.reduce((sum,v,i)=>sum+v*(target[i]-arrived.position[i])/3,0)).toBeCloseTo(1,5);
+ expect(forward.reduce((sum,v,i)=>sum+v*(target[i]-arrived.position[i])/gap(arrived.position,target),0)).toBeCloseTo(1,5);
  await select(page,'Proxima');await page.mouse.click(640,360);await expect(page.locator('.details h2')).toHaveText('Barnards stjärna');
  await page.screenshot({path:'work/arrival.png'});
 });

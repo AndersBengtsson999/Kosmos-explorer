@@ -4,7 +4,7 @@ export class CameraAim {
  private from=new Quaternion();private to=new Quaternion();elapsed=0;active=false;
  start(camera:PerspectiveCamera,target:Vector3){
   const toward=target.clone().sub(camera.position);
-  if(toward.lengthSq()<1e-12){this.active=false;return;}
+  if(toward.lengthSq()<1e-28){this.active=false;return;}
   this.from.copy(camera.quaternion);
   const view=camera.clone();
   if(Math.abs(toward.normalize().dot(view.up))>.999999)view.up.copy(Math.abs(toward.z)<.9?new Vector3(0,0,1):new Vector3(1,0,0));

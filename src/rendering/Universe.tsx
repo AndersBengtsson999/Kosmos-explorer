@@ -1,3 +1,4 @@
+import {NearStars} from './NearStar';
 import {StarCloud} from './StarCloud';
 import {Canvas} from '@react-three/fiber';
 import {Line} from '@react-three/drei';
@@ -19,7 +20,7 @@ function DestinationLine(){
 }
 function Scene(){const showScale=useStore(s=>s.showScale),showAxes=useStore(s=>s.showAxes);
  return <><color attach="background" args={['#070c16']}/><Navigation/>{showScale&&<gridHelper args={[100,20,'#203047','#121e30']} position={[0,-0.02,0]}/>}{showAxes&&<><Line points={[[0,0,0],[10,0,0]]} color="#a76f6f"/><Line points={[[0,0,0],[0,0,-10]]} color="#73a084"/><Line points={[[0,0,0],[0,10,0]]} color="#738fae"/></>}<DestinationLine/>
- <StarCloud/></>;
+ <StarCloud/><NearStars/></>;
 }
-const initialCamera = {position:[24,16,30] as [number,number,number],fov:55,near:0.01,far:100000};
+const initialCamera = {position:[24,16,30] as [number,number,number],fov:55,near:1e-11,far:100000};
 export const Universe=memo(function Universe(){return <Boundary><Canvas camera={initialCamera} dpr={[1,1.75]} fallback={<div className="fallback">WebGL saknas. Katalogen kan fortfarande utforskas via sökningen.</div>}><Scene/></Canvas></Boundary>;});

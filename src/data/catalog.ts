@@ -1,6 +1,6 @@
 import raw from './stars.json';
 import {position,type Vec3} from '../math/coordinates';
-export interface Star {temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
+export interface Star {radiusSolar?:number|null;radiusSource?:string;temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
 export function parseCatalog(input:unknown):Star[]{
  if(!Array.isArray(input)||input.length===0||input.length>100000)throw new Error('Katalogen måste innehålla 1–100000 stjärnor.');
  const ids=new Set<string>();
@@ -13,6 +13,7 @@ export function parseCatalog(input:unknown):Star[]{
   for(const key of ['parallaxError','mag','bpRp'])if(s[key]!==null&&(typeof s[key]!=='number'||!Number.isFinite(s[key])))throw new Error(`Ange ett tal eller null för ${key}.`);
   if(s.parallaxError!==null&&(s.parallaxError as number)<0)throw new Error('Osäkerhet får inte vara negativ.');
   if(s.temperature!==undefined&&s.temperature!==null&&(typeof s.temperature!=='number'||!Number.isFinite(s.temperature)||s.temperature<=0))throw new Error('Ogiltig temperatur');
+  if(s.radiusSolar!=null&&(typeof s.radiusSolar!=='number'||!Number.isFinite(s.radiusSolar)||s.radiusSolar<=0||typeof s.radiusSource!=='string'||!s.radiusSource.trim()))throw new Error('Radie kräver positivt värde och källa');
   ids.add(s.id);const star=s as unknown as Star;return {...star,position:position(star.ra,star.dec,star.parallax)};
  });
 }

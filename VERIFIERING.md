@@ -1,50 +1,43 @@
-# Cosmos Explorer 0.4 – verifiering 2026-11-02
+# Cosmos Explorer 0.5 – verifiering 2026-11-03
 
 ## Resultat
 
-46 av 46 enhetstester och 5 av 5 Chrome-scenarier passerar. Den slutliga webbläsarkörningen tog 45,0 sekunder. TypeScript och Vite-produktionsbygge passerar. Webbläsarscenarier för dator och mobil passerar.
+59 av 59 enhetstester och 6 av 6 Chrome-scenarier passerar. TypeScript och Vite-produktionsbygget passerar. Desktop-närbild och mobilens Upptäck-panel har granskats visuellt. Kamera, paus, återupptagning, fri blick, avbrott, lägesbyten och lokal rotation ingår i kontrollen.
 
-## Verkliga katalogdata
+## Funktioner och data
 
-100 000 unika ESA Gaia DR3-källor importerades direkt från ESA TAP. 10 000 laddas normalt; 100 000 väljs i inställningar. Solen läggs till som origo. Original-CSV, frågan, hämtningstid, SHA-256 och reproducerbart importskript ingår. ICRS, J2016.0. Urvalet sträcker sig från 4,25 till 239,76 ljusår. 28 894 källor har modelltemperatur.
+Upptäck har sex kategorier och tio poster per sida. Skenbar magnitud sorteras stigande, temperatur och källbelagd radie fallande; närhet använder verkligt 3D-avstånd. Saknade värden filtreras bort. Solen undantas från upptäcktslistorna.
 
-Källor: ESA Gaia DR3 för astrometri/fotometri/temperatur; NASA Science för ett begränsat Proxima b/d-exempel; Astropy Galactocentric-referensen för riktningen mot galaxcentrum. Se README för direkta länkar. NASA:s TAP gav HTTP 525; någon komplett exoplanetimport kunde därför inte verifieras.
+100 000 unika verkliga Gaia DR3-källor finns kvar oförändrade, med ICRS/J2016.0 och reproducerbart importskript. 10 000 laddas normalt. Temperatur är Gaia GSP-Phot-modellvärden. Planetvärdar är ett begränsat NASA-verifierat Proxima b/d-urval. Radier saknas i det medföljande Gaia-uttaget: Största visar därför saknat underlag. JSON-import av radie kräver källa. IAU 2015 B3 ger nominell solradie; se README för källänkar.
+
+Närbilder använder källbelagd radie när den finns, annars tydligt märkt illustrativ 1 solradie. Vinkelstorlek beräknas med 2 asin(R/d). Mjuk punkt–sfärövergång, svag korona och schematisk temperaturfärg är visuella approximationer. Ankomst fyller 44 procent av det smalare synfältet och håller kameran utanför ytan. Logaritmisk avståndsprofil kombineras med femtegradig acceleration/inbromsning i befintlig resemodell. Närbilder använder kamerarelativa koordinater och ett lokalt rumsindex; högst åtta sfärer samtidigt.
 
 ## Prestanda
 
-Chrome med SwiftShader, 1280 × 720, DPR 1. Statisk standardvy, cirka fem sekunders mätning per katalog. Bildruteintervall är inte GPU-renderingstidsstämplar. JS-heap mäts efter begärd garbage collection.
+Chrome/SwiftShader, 1280 × 720, DPR 1, statisk standardvy, cirka fem sekunder per katalog. Detta mäter bildruteintervall, inte isolerad GPU-renderingstid. Siffror från olika körningar varierar med datorbelastningen.
 
-| Källor | Median bildruta | P95 | JS-heap | GPU-punktattribut | Ritningsanrop | Närsökning |
+| Källor | Median bildruta | P95 | JS-heap | GPU-punktattribut | Närsökning | Upprepad |
 |---:|---:|---:|---:|---:|---:|---:|
-| 10000 | 31.2 ms | 40.0 ms | 40.4 MB | 0.28 MB | 2 | 2.8 ms |
-| 100000 | 55.4 ms | 64.4 ms | 78.1 MB | 2.80 MB | 2 | 46.8 ms |
+| 10 000 | 29,8 ms | 34,7 ms | 45,0 MB | 0,32 MB | 2,8 ms | 0,1 ms |
+| 100 000 | 55,7 ms | 59,3 ms | 90,9 MB | 3,20 MB | 44,4 ms | 0,7 ms |
 
-Upprepad närsökning från samma position: 0,1 ms (10k), 0,8 ms (100k). Tidigare separata körning gav median 67,5/120,3 ms. Detta är inte ett isolerat A/B-test; belastningen på datorn kan variera.
+Två ritningsanrop i standardvyn. JS-heap mäts efter begärd garbage collection och är inte total processminne; attributmåttet inkluderar inte drivrutin eller framebuffer. Närbilder kräver ytterligare geometri/anrop när de visas. Hårdvaru-GPU, Safari och fysisk mobil är inte verifierade. Rådata och tidigare körningar finns i PERFORMANCE.json.
 
-Fullständiga mätvärden, antal sampel och miljö finns i PERFORMANCE.json. JS-heap är inte total processminne; GPU-attributmåttet exkluderar drivrutin, framebuffer och övrig GPU-allokering. 100k fungerar men är inte flytande i denna mjukvarurendering. Hårdvaruaccelererad GPU, Safari och fysisk mobil återstår att mäta.
+## Täckning och begränsningar
 
-## Täckning
+Enhetstester: verkliga 10k/100k-binärkataloger, ID-precision, koordinater, sökning, upptäcktskategorier, saknade data, importerad radie, vinkeldiameter, övertoningskurva, ankomst vid olika bildformat, närindex, ytskydd, siktning på små avstånd och upprepade resor mellan olika stjärnor.
 
-Enhetstester: båda verkliga binärkatalogerna, unika och exakta 64-bitars-ID:n, kvalitetssnitt, koordinater, normaliserad namn/ID-sökning, närsökning från godtycklig position, korrupta data, JSON-import och befintlig reslogik.
+Chrome: Upptäck/paginering/tom radiekategori/planetfilter, Visa/Res dit, 10-sekunders närankomst, siktning, lokal rotation, mobil utan horisontell överströmning, 20-sekunders standard, paus/fri blick/återupptagning/avbrott, lägesbyte, manuell rörelse/stopp, stjärnval, 10k/100k-byte och bevarad katalog vid HTTP 503. Inga rapporterade shaderfel i de kontrollerade scenarierna.
 
-Chrome: defaultrestid, paus, fri blick, återupptagning, avbrott, lägesbyte, 10-sekunders ankomst, klickval i GPU-punktmolnet, manuell rörelse, stopp, riktningshjälp, mobilreferenser, 10k/100k-byte, shaderfel och bevarad 100k-katalog efter simulerat HTTP 503. Kamerans förflyttnings- och orienteringsmodeller har inte ändrats.
-
-## Kvarvarande begränsningar
-
-Luminositet och detaljerad spektralklass saknas i det hämtade urvalet och visas som Okänt. Planeter är inte systematiskt korsmatchade; endast Proxima-exemplet är källbelagt. Okänt betyder inte att inga planeter finns. Punktstorleken är avståndsanpassad men ingen spatial strömning/octree-LOD ingår. Val i ett överlappande punktmoln sker inom 8 pixlar; sökning ger tillgång till varje post. GPU-positioner avrundas till float32; original och navigering behåller float64. Ingen ny fysisk simulering ingår. Vite varnar fortsatt för cirka 1,2 MB JavaScript (342 kB gzip).
+Yta och korona är illustrationer, inte observationer. Exoplanet- och radietäckningen är ofullständig. Ingen relativistisk fysik, kontinuerlig kollisionssimulering eller hinderundvikande färdväg ingår. Ytskyddet gäller visade kamerapositioner; hög hastighet kan passera en stjärna mellan bildrutor. Manuellt ändrad blick bevaras även vid ankomst. Ankomstens synfältsanpassning beräknas vid start, inte på nytt vid fönsterändring under resan. Vite varnar fortfarande för ett JavaScript-paket på cirka 1,22 MB (345 kB gzip).
 
 ## Reproducera
 
 ```sh
-python3 scripts/import-gaia.py
 npm install
 npm test
 npm run build
 npm run test:e2e
 ```
 
-Google Chrome krävs för webbläsartester. Importskriptet kräver Python 3 och curl.
-
-## Fortsatt prestandaarbete
-
-Dold navigerings-HUD är avmonterad i kartläge och gör inga koniska stjärnsökningar. Destinationslinjen återanvänder buffert och målreferens i stället för att söka hela katalogen och skapa vektorer varje bildruta. Sökning cachar sortering per oföränderlig katalog och senaste närposition, använder kvadrerade avstånd och återanvänder svensk namnjämförare. Nytt test kontrollerar positionsbyte, katalogbyte, resultatmutation och filtrerad avståndsordning. Kamerakoden och samtliga astronomiska positioner är oförändrade.
+Google Chrome krävs för webbläsartester. Katalogen kan återimporteras med `python3 scripts/import-gaia.py` (Python 3 och curl).

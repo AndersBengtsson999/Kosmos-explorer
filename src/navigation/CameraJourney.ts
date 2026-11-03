@@ -8,19 +8,23 @@ export class CameraJourney {
  private endPosition=new Vector3();
  readonly target=new Vector3();
  active=false;paused=false;elapsed=0;duration=20;progress=0;
- start(camera:PerspectiveCamera,target:Vector3,duration=20) {
+ start(camera:PerspectiveCamera,target:Vector3,duration=20,arrival=ARRIVAL_DISTANCE) {
   if(!JOURNEY_DURATIONS.some(value=>value===duration))throw new Error('Ogiltig restid');
   this.startPosition.copy(camera.position);this.target.copy(target);
   const approach=camera.position.clone().sub(target);
-  if(approach.lengthSq()<1e-12)camera.getWorldDirection(approach).negate();
-  this.endPosition.copy(target).addScaledVector(approach.normalize(),ARRIVAL_DISTANCE);
+  if(approach.lengthSq()<1e-28)camera.getWorldDirection(approach).negate();
+  this.endPosition.copy(target).addScaledVector(approach.normalize(),arrival);
   this.duration=duration;this.elapsed=0;this.progress=0;this.paused=false;this.active=true;
  }
  step(camera:PerspectiveCamera,delta:number) {
   if(!this.active||this.paused)return false;
   this.elapsed=Math.min(this.duration,this.elapsed+Math.max(0,Number.isFinite(delta)?delta:0));
   this.progress=Math.min(1,this.elapsed/this.duration);
-  camera.position.lerpVectors(this.startPosition,this.endPosition,smootherstep(this.progress));
+  const t=smootherstep(this.progress),start=this.startPosition.distanceTo(this.target),end=this.endPosition.distanceTo(this.target);
+  // Log-distance travel makes the many orders of magnitude perceptible, with smooth endpoints.
+  if(start>end&&end<.001){const radius=Math.exp(Math.log(start)*(1-t)+Math.log(end)*t);camera.position.copy(this.startPosition).sub(this.target).multiplyScalar(radius/start).add(this.target);}
+  else camera.position.lerpVectors(this.startPosition,this.endPosition,t);
+  if(this.progress===1)camera.position.copy(this.endPosition);
   if(this.progress>=1)this.active=false;
   return true;
  }

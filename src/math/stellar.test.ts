@@ -1,0 +1,16 @@
+import {describe,it,expect} from 'vitest';
+import {PerspectiveCamera,Vector3} from 'three';
+import {catalog} from '../data/catalog';
+import {discover} from '../data/discovery';
+import {angularDiameter,arrivalDistance,radiusInfo,SOLAR_RADIUS_LY,sphereBlend} from './stellar';
+import {CameraJourney} from '../navigation/CameraJourney';
+import {CameraAim} from '../navigation/CameraAim';
+describe('discovery and physical scale',()=>{
+ it('sorts magnitude ascending and excludes missing values',()=>{const stars=[{...catalog[1],mag:null},{...catalog[2],mag:5},{...catalog[3],mag:-1}];expect(discover(stars,'brightest',[0,0,0]).map(s=>s.mag)).toEqual([-1,5]);});
+ it('sorts temperatures and documented radii, excluding unknowns',()=>{const stars=[{...catalog[1],temperature:5000,radiusSolar:2,radiusSource:'test fixture'},{...catalog[2],temperature:9000,radiusSolar:3,radiusSource:'test fixture'},{...catalog[3],temperature:null}];expect(discover(stars,'hottest',[0,0,0])[0]).toBe(stars[1]);expect(discover(stars,'largest',[0,0,0])).toEqual([stars[1],stars[0]]);expect(discover(catalog,'largest',[0,0,0])).toEqual([]);});
+ it('only includes verified planet hosts and sorts real distances',()=>{expect(discover(catalog,'planets',[0,0,0]).map(s=>s.name)).toEqual(['Proxima Centauri']);expect(discover(catalog,'nearby',catalog[20].position)[0]).toBe(catalog[20]);expect(discover(catalog,'nearest',[0,0,0])[0].name).toBe('Proxima Centauri');});
+ it('distinguishes illustrative and documented radius',()=>{expect(radiusInfo(catalog[1])).toEqual({ly:SOLAR_RADIUS_LY,known:false});expect(radiusInfo({...catalog[1],radiusSolar:2,radiusSource:'test fixture'})).toEqual({ly:2*SOLAR_RADIUS_LY,known:true});});
+ it('computes angular diameter and a smooth monotonic blend',()=>{expect(angularDiameter(1,2)).toBeCloseTo(Math.PI/3);expect(sphereBlend(0)).toBe(0);expect(sphereBlend(.003)).toBe(1);let last=0;for(let i=0;i<100;i++){const blend=sphereBlend(i*.00003);expect(blend).toBeGreaterThanOrEqual(last);expect(blend-last).toBeLessThan(.03);last=blend;}});
+ it.each([.46,1,1.78])('fits arrival into the narrower field of view at aspect %s',aspect=>{const r=SOLAR_RADIUS_LY,d=arrivalDistance(r,55,aspect);expect(d).toBeGreaterThan(r);const field=Math.min(55*Math.PI/180,2*Math.atan(Math.tan(55*Math.PI/360)*aspect));expect(angularDiameter(r,d)/field).toBeCloseTo(.44);});
+ it('travels to tiny radii at large coordinates, pauses, retargets and aims accurately',()=>{const c=new PerspectiveCamera(55,1,1e-11,100000),j=new CameraJourney(),aim=new CameraAim();c.position.set(100,20,-30);for(const target of [new Vector3(101,21,-31),new Vector3(-20,7,9)]){const r=SOLAR_RADIUS_LY,d=arrivalDistance(r,55);j.start(c,target,20,d);let prev=c.position.distanceTo(target);for(let i=0;i<20;i++){j.step(c,1);const gap=c.position.distanceTo(target);expect(gap).toBeLessThanOrEqual(prev+1e-12);expect(gap).toBeGreaterThan(r);prev=gap;if(i===5){j.paused=true;const p=c.position.clone();j.step(c,20);expect(c.position.equals(p)).toBe(true);j.paused=false;}}expect(Math.abs(c.position.distanceTo(target)/d-1)).toBeLessThan(1e-6);aim.start(c,target);aim.step(c,2);expect(c.getWorldDirection(new Vector3()).dot(target.clone().sub(c.position).normalize())).toBeCloseTo(1,7);}});
+});
