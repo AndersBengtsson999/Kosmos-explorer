@@ -2,7 +2,7 @@
 
 ## Resultat
 
-75 av 75 enhetstester och 8 av 8 Chrome-scenarier passerar. TypeScript och Vite-produktionsbygget passerar. Desktop-närbild och mobilens Upptäck-panel har granskats visuellt. Kamera, paus, återupptagning, fri blick, avbrott, lägesbyten och lokal rotation ingår i kontrollen.
+78 av 78 enhetstester och 8 av 8 Chrome-scenarier passerar. TypeScript och Vite-produktionsbygget passerar. Desktop-närbild och mobilens Upptäck-panel har granskats visuellt. Kamera, paus, återupptagning, fri blick, avbrott, lägesbyten och lokal rotation ingår i kontrollen.
 
 ## Senaste korrigering: Sirius och baskatalogen
 
@@ -51,3 +51,14 @@ npm run test:e2e
 ```
 
 Google Chrome krävs för webbläsartester. Katalogen kan återimporteras med `python3 scripts/import-gaia.py` (Python 3 och curl).
+
+
+## Resepanel och avståndsformat – 2026-11-03
+
+Slutkörning: 78 enhetstester, åtta webbläsarscenarier och produktionsbygget passerar. En tidigare webbläsarkörning fick tidsavbrott; hela sviten kördes om och passerade. Desktop- och mobilbilder av Sirius ankomst har granskats.
+
+Gemensam svensk avståndsformatering: ljusår från 1 ljusår, AU från 0,1 AU, annars kilometer. Enhet väljs före avrundning. Positivt avstånd under en kilometer visas som < 1 km, exakt noll som 0 km. Ingen exponentnotation används. Gränsfall, mycket små/stora värden och svenska decimal-/tusentalsseparatorer ingår i testerna.
+
+Resepanelen visar destination, status, procent av aktiv restid, återstående avstånd till ankomstpunkt och aktuellt centrumavstånd. Procenten fryser under paus; 100 procent visas först vid ankomst. En kort hjälptext skiljer stoppunkten utanför ytan från centrum. Kontroller ligger på egen rad. Desktop-kortet ersätter tillfälligt informationspanelen till höger; mobilkortet ligger nederst. Kamerakod och ankomstformel är oförändrade.
+
+Sirius A saknar verifierad radie i den lokala katalogen: illustrativ 1 solradie märks tydligt. Tester vid olika bildformat verifierar att ankomstpunkten ligger utanför denna radie och anpassas efter synfältet. Desktop-testet visar cirka 3 318 885 km till centrum vid ankomst och 0 km kvar till stoppunkten. Detta är avståndet för den illustrativa modellen, inte en uppmätt Sirius-radie. Stjärnans verkliga position ändras inte. Befintlig begränsning kvarstår: synfältsanpassningen beräknas vid resans start.

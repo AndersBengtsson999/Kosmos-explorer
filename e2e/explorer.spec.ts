@@ -12,7 +12,7 @@ test('20 second default, pause, free look, resume and cancellation',async({page}
  await expect(page.getByRole('region',{name:'Pågående resa'})).toBeVisible();
  await page.waitForTimeout(2200);await page.getByRole('button',{name:'Pausa',exact:true}).click();
  await expect(page.getByRole('button',{name:'Återuppta'})).toBeVisible();await page.waitForTimeout(200);
- const paused=await pose(page);await page.getByRole('button',{name:'Rymdskepp',exact:false}).click();await page.getByRole('button',{name:'Kartläge',exact:false}).click();await page.waitForTimeout(500);expect(gap((await pose(page)).position,paused.position)).toBeLessThan(1e-7);
+ const paused=await pose(page);const pausedPercent=await page.getByLabel('Genomförd resa').innerText();expect(parseInt(pausedPercent)).toBeGreaterThan(0);await expect(page.locator('.journey-summary')).toContainText('Pausad');await page.getByRole('button',{name:'Rymdskepp',exact:false}).click();await page.getByRole('button',{name:'Kartläge',exact:false}).click();await page.waitForTimeout(500);expect(gap((await pose(page)).position,paused.position)).toBeLessThan(1e-7);await expect(page.getByLabel('Genomförd resa')).toHaveText(pausedPercent);
  await page.mouse.move(180,350);await page.mouse.down();await page.mouse.move(330,390,{steps:8});await page.mouse.up();
  const looked=await pose(page);expect(rotation(looked.quaternion,paused.quaternion)).toBeGreaterThan(.001);
  await page.getByRole('button',{name:'Återuppta'}).click();await page.waitForTimeout(700);

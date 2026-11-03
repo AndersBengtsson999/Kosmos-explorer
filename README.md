@@ -207,3 +207,23 @@ Sökning omfattar namn, alias, Bayerbeteckningar, HIP, HD och Gaia. Gemener/vers
 Dubbletter slås ihop endast genom verifierade katalogidentifierare, aldrig genom fuzzy namn eller närhet. Sirius A och B och Alpha Centauri A/B förblir olika objekt. Motstridiga komponentidentifierare i JSON-import avvisas. Sirius B läggs inte till som ett nytt kvalitetsgodkänt Gaia-objekt; den nuvarande kvalitetsgränsen bevaras. För 10k/100k tillkommer sju saknade objekt; Proxima och Barnard kompletteras utan dubbletter. Totalt visas 10 007 / 100 007 stjärnor plus solen.
 
 Namntäckningen är fortfarande begränsad till den verifierade baskatalogen; övriga Gaia-objekt kan sökas via sina Gaia-ID:n. Mer fullständig korsmatchning av hela katalogen återstår. Kamerakod och 3D-rendering har inte ändrats för denna korrigering.
+
+
+## Tydligare resepanel (2026-11-03)
+
+Alla huvudsakliga avståndsvisningar använder nu `formatDistance` med svensk talformatering och normal notation. Enheten väljs på det oavrundade avståndet:
+
+- Från och med **1 ljusår**: ljusår, två decimaler.
+- Under 1 ljusår men från och med **0,1 AU**: AU, två decimaler.
+- Under **0,1 AU**: hela kilometer med svensk tusentalsgruppering.
+- Positiva avstånd mindre än 1 km: **< 1 km**. Exakt noll: **0 km**. Ogiltiga avstånd: streck.
+
+Omvandlingarna använder 1 AU = 149 597 870,7 km (IAU:s exakta astronomiska enhet) och 1 julianskt ljusår = 9 460 730 472 580,8 km. Gränserna är ett presentationsval, inte ändrade astronomiska data. Avrundning kan ge samma siffra strax på olika sidor om en gräns; själva enheten bestäms före avrundning. Ingen exponentnotation används av formatfunktionen.
+
+Panelen visar destination, Pågår/Pausad/Ankommer, procent av **aktiv restid**, avstånd till den planerade ankomstpunkten och aktuellt avstånd till centrum. Procenten avser tiden eftersom förflyttningen inte har konstant hastighet. Ankommer visas från 90 procent av tiden, om resan inte är pausad. Pågående resa avrundas nedåt och visar högst 99 procent; 100 procent reserveras för ankomst. Paus fryser resemodellens klocka som tidigare.
+
+Vid ankomst ligger stoppunkten utanför ytan. `arrivalDistance` och kamerastyrningen är oförändrade: dokumenterad/nominell radie när sådan finns, annars tydligt märkt illustrativ solradie, samt anpassning till det smalare synfältet. Sirius A har ingen verifierad radie i den lokala kompletteringen och använder därför **illustrativ 1 solradie**, aldrig presenterad som mätvärde. Tester kontrollerar att avståndet överstiger denna radie även i porträttformat. Vid ankomst visas 0 km kvar och det faktiska centrumavståndet; centrumavståndet fortsätter uppdateras om användaren utforskar omgivningen.
+
+Knapparna ligger på en egen rad. I rymdskeppsläge döljs manöverpanelen medan ankomstkortet visas för att undvika överlappning; stäng kortet för att visa den igen. Tangentbordsstyrningen påverkas inte. Vetenskapligt detaljerade axelkoordinater är fortfarande separata från de automatiskt anpassade avstånden.
+
+På desktop ersätter ankomstkortet tillfälligt informationspanelen till höger, så att stjärnan förblir fri i mitten. Stäng kortet eller välj en annan stjärna för att återgå till informationspanelen. På mobil ligger kortet vid skärmens nederkant.
