@@ -1,0 +1,24 @@
+[
+  {
+    "file": "hosts-simbad.csv",
+    "endpoint": "https://simbad.harvard.edu/simbad/sim-tap/sync",
+    "parameters": {
+      "REQUEST": "doQuery",
+      "LANG": "ADQL",
+      "FORMAT": "csv",
+      "QUERY": "SELECT b.main_id,b.ra,b.dec,b.plx_value,b.plx_err,b.coo_bibcode,b.plx_bibcode,i.ids FROM basic b JOIN ident n ON b.oid=n.oidref JOIN ids i ON b.oid=i.oidref WHERE n.id IN ('TRAPPIST-1','HIP 70890')"
+    },
+    "retrieved": "2026-11-04T09:12:42.781253+00:00",
+    "sha256": "a85daf10062081773c189684993de78fa23eb04b263368c253b5196d6452810a"
+  },
+  {
+    "file": "exoplanets-full.json",
+    "endpoint": "https://exoplanet.ipac.caltech.edu/TAP/sync",
+    "parameters": {
+      "query": "select * from pscomppars where hostname='TRAPPIST-1' or hostname='Proxima Cen'",
+      "format": "json"
+    },
+    "retrieved": "2026-11-04T09:12:44.924281+00:00",
+    "sha256": "d31066a8f79c5f6914bcac20b47813effb7179ee6688c52502452bd9dfba5581"
+  }
+]

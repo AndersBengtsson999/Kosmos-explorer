@@ -1,0 +1,21 @@
+import {describe,it,expect} from 'vitest';
+import {readFileSync} from 'node:fs';
+import {Vector3,PerspectiveCamera} from 'three';
+import {catalog,mergeCatalog,knownStars} from './catalog';
+import {decodeCatalog} from './binary';
+import {searchStars} from './search';
+import {systems,systemFor,matchingPlanets,visualRadius} from '../planets/model';
+import {position,distance} from '../math/coordinates';
+import {CameraJourney} from '../navigation/CameraJourney';
+import {arrivalDistance,radiusInfo} from '../math/stellar';
+import {openPlanetSystem,usePlanetStore} from '../planets/state';
+const id='Gaia DR3 2635476908753563008';
+describe('common star and planet catalog',()=>{
+ it.each(['TRAPPIST-1','trappist 1','TRAPPIST‑1','TRAPPIST-1 e','trappist1e','K2-112','2MASS J23062928-0502285',id])('finds the one canonical host for %s, even offline',q=>{for(const all of [catalog,mergeCatalog([])])expect(searchStars(all,q,'name').map(s=>s.id)).toEqual([id]);});
+ it('guarantees every implemented host after reset and arbitrary import',()=>{for(const all of [catalog,mergeCatalog([]),mergeCatalog([catalog[1]])])for(const system of systems){const host=all.find(s=>s.id===system.hostId);expect(host).toBeDefined();expect(all.filter(s=>s.id===system.hostId)).toHaveLength(1);expect(host!.position.every(Number.isFinite)).toBe(true);}});
+ it('uses Gaia ICRS J2016 position, photometry and the same coordinate transform as travel',()=>{const host=catalog.find(s=>s.id===id)!;expect(host.epoch).toBe(2016);expect(host.ra).toBe(346.62652162764437);expect(host.mag).toBe(15.622554);expect(host.position).toEqual(position(host.ra,host.dec,host.parallax));expect(distance(host.position)).toBeCloseTo(40.6616,2);const camera=new PerspectiveCamera(55,1);camera.position.set(24,16,30);const trip=new CameraJourney(),target=new Vector3(...host.position),stop=arrivalDistance(radiusInfo(host).ly,55,1);trip.start(camera,target,10,stop);trip.step(camera,10);expect(camera.position.distanceTo(target)).toBeCloseTo(stop,10);});
+ it.each([10000,100000])('adds names without duplicating or moving the Gaia object in %s sources',n=>{const raw=readFileSync(new URL(`../../public/catalog/gaia-${n}.bin`,import.meta.url)),rows=decodeCatalog(raw.buffer.slice(raw.byteOffset,raw.byteOffset+raw.byteLength) as ArrayBuffer);const original=rows.find(s=>s.id===id)!;const all=mergeCatalog(rows);expect(all.filter(s=>s.id===id)).toHaveLength(1);expect(searchStars(all,'TRAPPIST-1 e','name')[0].position).toEqual(original.position);expect(searchStars(all,'TRAPPIST-1','name')[0].mag).toBe(original.mag);});
+ it('deduplicates documented alternate host identities without fuzzy proximity',()=>{const host=knownStars.find(s=>s.id===id)!;const all=mergeCatalog([host,{...host,id:'2MASS J23062928-0502285',aliases:[]},{...host,id:'K2-112',aliases:[]}]);expect(all.filter(s=>s.id===id)).toHaveLength(1);expect(searchStars(all,'Sirius A','name')[0].id).toBe('HIP 32349');});
+ it('links all seven confirmed TRAPPIST planets and Proxima aliases',()=>{expect(systemFor(id)?.planets.map(p=>p.name)).toEqual(['b','c','d','e','f','g','h'].map(x=>'TRAPPIST-1 '+x));for(const q of ['Proxima Centauri','Proxima Centauri b','Proxima Cen b'])expect(searchStars(catalog,q,'name')[0].name).toBe('Proxima Centauri');expect(matchingPlanets(id,'TRAPPIST-1 e').map(p=>p.id)).toEqual(['TRAPPIST-1 e']);});
+ it('opens the requested planet, resets stale system state, and marks approximations',()=>{openPlanetSystem(id,'TRAPPIST-1 e');expect(usePlanetStore.getState().selected).toBe('TRAPPIST-1 e');expect(usePlanetStore.getState().host).toBe(id);openPlanetSystem('sun');expect(usePlanetStore.getState().selected).toBe('399');for(const p of systemFor(id)!.planets){expect(p.illustrativeOrbit).toBe(true);expect(p.epoch).toBeNull();expect(visualRadius(p,true)).toBeLessThan(p.a*.1);}const proxima=systems.find(s=>s.starName==='Proxima Centauri')!;expect(proxima.planets.every(p=>p.radiusDerived&&p.massMinimum)).toBe(true);});
+});

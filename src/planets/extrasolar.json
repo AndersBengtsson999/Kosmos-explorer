@@ -1,0 +1,310 @@
+[
+  {
+    "hostId": "Gaia DR3 5853498713190525696",
+    "name": "Proxima Centauri",
+    "starName": "Proxima Centauri",
+    "starRadiusKm": 98093.7,
+    "starRadiusSource": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+    "illustrativeOrbit": true,
+    "planets": [
+      {
+        "id": "Proxima Cen b",
+        "name": "Proxima Centauri b",
+        "aliases": [
+          "Proxima Cen b",
+          "Proxima Centauri b"
+        ],
+        "radiusKm": 6505.662,
+        "radiusDerived": true,
+        "massKg": 6.30066045e+24,
+        "massMinimum": true,
+        "a": 0.04848,
+        "e": 0.0,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 0.0,
+        "period": 11.18465,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/Proxima%20Cen%20b",
+        "illustrativeOrbit": true,
+        "observedInclination": null,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://exoplanetarchive.ipac.caltech.edu/docs/pscp_calc.html",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbincl": "https://exoplanetarchive.ipac.caltech.edu/docs/pscp_calc.html"
+        }
+      },
+      {
+        "id": "Proxima Cen d",
+        "name": "Proxima Centauri d",
+        "aliases": [
+          "Proxima Cen d",
+          "Proxima Centauri d"
+        ],
+        "radiusKm": 4413.6452,
+        "radiusDerived": true,
+        "massKg": 1.5527694000000002e+24,
+        "massMinimum": true,
+        "a": 0.02881,
+        "e": 0.0,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 180.0,
+        "period": 5.12338,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/Proxima%20Cen%20d",
+        "illustrativeOrbit": true,
+        "observedInclination": null,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://exoplanetarchive.ipac.caltech.edu/docs/pscp_calc.html",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract",
+          "pl_orbincl": "https://exoplanetarchive.ipac.caltech.edu/docs/pscp_calc.html"
+        }
+      }
+    ]
+  },
+  {
+    "hostId": "Gaia DR3 2635476908753563008",
+    "name": "TRAPPIST-1",
+    "starName": "TRAPPIST-1",
+    "starRadiusKm": 82927.44,
+    "starRadiusSource": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+    "illustrativeOrbit": true,
+    "planets": [
+      {
+        "id": "TRAPPIST-1 b",
+        "name": "TRAPPIST-1 b",
+        "aliases": [
+          "TRAPPIST-1 b",
+          "TRAPPIST-1 b"
+        ],
+        "radiusKm": 7117.959600000001,
+        "radiusDerived": false,
+        "massKg": 8.205789060000001e+24,
+        "massMinimum": false,
+        "a": 0.01154,
+        "e": 0.00622,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 0.0,
+        "period": 1.510826,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20b",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.728,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 c",
+        "name": "TRAPPIST-1 c",
+        "aliases": [
+          "TRAPPIST-1 c",
+          "TRAPPIST-1 c"
+        ],
+        "radiusKm": 6996.7757,
+        "radiusDerived": false,
+        "massKg": 7.81162452e+24,
+        "massMinimum": false,
+        "a": 0.0158,
+        "e": 0.00654,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 51.42857142857143,
+        "period": 2.421937,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20c",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.778,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 d",
+        "name": "TRAPPIST-1 d",
+        "aliases": [
+          "TRAPPIST-1 d",
+          "TRAPPIST-1 d"
+        ],
+        "radiusKm": 5025.942800000001,
+        "radiusDerived": false,
+        "massKg": 2.3172097200000002e+24,
+        "massMinimum": false,
+        "a": 0.02227,
+        "e": 0.00837,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 102.85714285714286,
+        "period": 4.049219,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20d",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.896,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 e",
+        "name": "TRAPPIST-1 e",
+        "aliases": [
+          "TRAPPIST-1 e",
+          "TRAPPIST-1 e"
+        ],
+        "radiusKm": 5867.852000000001,
+        "radiusDerived": false,
+        "massKg": 4.13275548e+24,
+        "massMinimum": false,
+        "a": 0.02925,
+        "e": 0.0051,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 154.28571428571428,
+        "period": 6.101013,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20e",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.793,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 f",
+        "name": "TRAPPIST-1 f",
+        "aliases": [
+          "TRAPPIST-1 f",
+          "TRAPPIST-1 f"
+        ],
+        "radiusKm": 6665.1145,
+        "radiusDerived": false,
+        "massKg": 6.20510541e+24,
+        "massMinimum": false,
+        "a": 0.03849,
+        "e": 0.01007,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 205.71428571428572,
+        "period": 9.20754,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20f",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.74,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 g",
+        "name": "TRAPPIST-1 g",
+        "aliases": [
+          "TRAPPIST-1 g",
+          "TRAPPIST-1 g"
+        ],
+        "radiusKm": 7200.874900000001,
+        "radiusDerived": false,
+        "massKg": 7.88926299e+24,
+        "massMinimum": false,
+        "a": 0.04683,
+        "e": 0.00208,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 257.14285714285717,
+        "period": 12.352446,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20g",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.742,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      },
+      {
+        "id": "TRAPPIST-1 h",
+        "name": "TRAPPIST-1 h",
+        "aliases": [
+          "TRAPPIST-1 h",
+          "TRAPPIST-1 h"
+        ],
+        "radiusKm": 4815.4655,
+        "radiusDerived": false,
+        "massKg": 1.9469339400000002e+24,
+        "massMinimum": false,
+        "a": 0.06189,
+        "e": 0.00567,
+        "i": 0,
+        "node": 0,
+        "peri": 0,
+        "mean": 308.57142857142856,
+        "period": 18.772866,
+        "epoch": null,
+        "source": "https://exoplanetarchive.ipac.caltech.edu/overview/TRAPPIST-1%20h",
+        "illustrativeOrbit": true,
+        "observedInclination": 89.805,
+        "eccentricityUnknown": false,
+        "references": {
+          "pl_rade": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_bmasse": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbper": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbsmax": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract",
+          "pl_orbeccen": "https://ui.adsabs.harvard.edu/abs/2018A&A...613A..68G/abstract",
+          "pl_orbincl": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "gaiaSha256": "162f8b1cee432e0d3ce814503ad22fe14d45ea47942eb1a0ed038e2dac7584c2",
+  "frame": "ICRS",
+  "epoch": 2016,
+  "earthRadiusKm": 6378.1,
+  "earthMassKg": 5.97219e+24,
+  "solarRadiusKm": 695700,
+  "orbitNote": "Extrasolar node, periapsis, inclination and initial mean anomaly are illustrative rendering angles, not measured positions; epoch is null.",
+  "hosts": [
+    "Gaia DR3 5853498713190525696",
+    "Gaia DR3 2635476908753563008"
+  ]
+}

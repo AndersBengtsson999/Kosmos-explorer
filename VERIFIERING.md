@@ -1,3 +1,15 @@
+# Cosmos Explorer 0.6.1 – planetsystemens värdstjärnor, 2026-11-04
+
+98/98 enhetstester, 12/12 webbläsarscenarier (Chrome/SwiftShader, 3,3 minuter) och TypeScript/Vite-produktionsbygget passerar. TRAPPIST-1 e har följts hela vägen genom ordinarie stjärnsökning, stjärnresa, systemval och planetresa; närbilden är visuellt granskad. Planetbild och banfas är tydligt illustrativa.
+
+Grundorsaken var saknade namn/alias och en oaktiverad systemkoppling, inte ett ljusstyrkefilter: TRAPPIST-1:s Gaia DR3-ID finns redan på rang 480 i båda stora katalogerna. G=15,622554, position och epok behålls. Start-/offlinekatalogen kompletteras med samma källbelagda värd. Sökningen använder samma funktion och resultattyp för stjärn- och planetnamn. Gemensamma kanoniska värd-ID:n länkar TRAPPIST-1 b–h, Proxima b/d och solsystemet.
+
+Nya tester kontrollerar namnavarianter, planetalias, dokumenterade katalogidentifierare, nätfel och egen import, värdgarantin för alla aktiva system, unikhet i 10k/100k, oförändrad Gaia-astrometri/fotometri, samma koordinatomvandling och resemodell samt korrekt planetval. Tidigare tester för Sirius, navigering, paus, mobilgränssnitt, solsystem och prestanda passerar. Startkatalogens förväntade antal uppdaterades från 158 till 159 objekt; offlinebaskatalogen från 10 till 11. De stora katalogernas objektantal är oförändrade.
+
+Källor: SIMBAD-korsidentifierare, befintligt Gaia DR3-uttag och NASA Exoplanet Archives pscomppars (hämtat 2026-11-04). Kontrollsummor och reproducerbar import finns i data/planets och scripts. Offlineregenerering verifierad. Exoplaneternas fas/orientering är illustrativa; Proximas radier är härledda och massor m sin i. Befintlig stjärnkamera, animation, avståndsmatematik och stjärnrendering är oförändrade. Bygget har fortsatt en stor JS-fil (cirka 1,26 MB / 354 kB gzip).
+
+---
+
 # Cosmos Explorer 0.6 – solsystemleverans, 2026-11-03
 
 83 av 83 enhetstester, 9 av 9 Chrome-scenarier och produktionsbygget passerar. Den slutliga webbläsaromgången tog 1,5 minut. Testerna omfattar åtta källbelagda planeter, värdstjärnans identitet, Keplerbanornas period och avståndsgränser, tidskontroll, okända värden, fysisk radie, upprepade resor och orientering. Webbläsaren verifierar resa till Jorden, paus/återupptagning, mobil återgång, bevarad stjärnkamera (tolerans 1e-10), återöppning och avbruten resa till Mars. Samtliga tidigare stjärnscenarier passerar, inklusive Sirius och 100k-katalogen.

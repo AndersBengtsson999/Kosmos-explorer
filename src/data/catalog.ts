@@ -1,3 +1,4 @@
+import hostRaw from './planet-hosts.json';
 import knownRaw from './known-stars.json';
 import {normalizeName} from './identity';
 import raw from './stars.json';
@@ -23,11 +24,13 @@ export function parseCatalog(input:unknown):Star[]{
  });
 }
 export const sun:Star={id:'sun',name:'Solen',aliases:['Sun','Sol'],ra:0,dec:0,parallax:0,parallaxError:null,mag:null,bpRp:null,epoch:2016,source:'Koordinatsystemets ursprung (approximation av solsystemets barycentrum)',position:[0,0,0]};
-export const knownStars=parseCatalog(knownRaw);
+// Host astrometry supplies a fallback; existing named-star records keep their identity/data.
+export const knownStars=[...new Map([...parseCatalog(hostRaw),...parseCatalog(knownRaw)].map(s=>[s.id,s])).values()];
+const hostIdentityKeys=new Set(hostRaw.flatMap(s=>[s.id,...s.aliases]).map(normalizeName));
 const identities=new Map<string,Star>();
 for(const star of knownStars)for(const id of [star.id,...star.aliases??[]]){
  // Only source-verified catalog identifiers are merge keys, never position or fuzzy names.
- if(/^(HIP|HD|Gaia DR[23])\s/i.test(id))identities.set(normalizeName(id),star);
+ if(/^(HIP|HD|Gaia DR[23]|2MASS|TIC|EPIC)\s/i.test(id)||hostIdentityKeys.has(normalizeName(id)))identities.set(normalizeName(id),star);
 }
 export function mergeCatalog(input:Star[]):Star[]{
  const merged=new Map<string,Star>();

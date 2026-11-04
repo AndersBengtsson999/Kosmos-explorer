@@ -1,10 +1,11 @@
+import {systemFor} from '../planets/model';
 import type {Star} from './catalog';
 import enrichment from './enrichment.json';
 import {searchStars} from './search';
 import type {Vec3} from '../math/coordinates';
 export const categories={nearest:'Närmaste stjärnorna',brightest:'Ljusstarkaste stjärnorna',planets:'Kända exoplaneter',largest:'Största stjärnorna',hottest:'Varmaste stjärnorna',nearby:'Utforska i närheten'};
 export type Category=keyof typeof categories;
-export const planetsFor=(star:Star)=>enrichment[star.id as keyof typeof enrichment]?.planets??[];
+export const planetsFor=(star:Star)=>systemFor(star.id)?.planets??enrichment[star.id as keyof typeof enrichment]?.planets??[];
 const cache=new WeakMap<Star[],Partial<Record<Category,Star[]>>>();
 export function discover(stars:Star[],category:Category,origin:Vec3){
  if(category==='nearby'||category==='nearest')return searchStars(stars,'',category==='nearby'?'nearby':'distance',origin).filter(s=>s.id!=='sun');

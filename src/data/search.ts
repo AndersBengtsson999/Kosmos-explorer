@@ -1,3 +1,4 @@
+import {planetSearchTerms} from '../planets/model';
 import {normalizeName} from './identity';
 import type {Star} from './catalog';
 import type {Vec3} from '../math/coordinates';
@@ -20,5 +21,5 @@ export function searchStars(stars:Star[],query:string,order:SortOrder,origin:Vec
  }
  const text=normalizeName(query);
  // Return a fresh result: callers may sort or otherwise modify their search results.
- return sorted.stars.filter(star=>{if(!text)return true;let name=names.get(star);if(name===undefined){name=[star.name,star.id,...star.aliases??[]].map(normalizeName);names.set(star,name);}return name.some(alias=>alias.includes(text));});
+ return sorted.stars.filter(star=>{if(!text)return true;let name=names.get(star);if(name===undefined){name=[star.name,star.id,...star.aliases??[],...planetSearchTerms(star.id)].map(normalizeName);names.set(star,name);}return name.some(alias=>alias.includes(text));});
 }
