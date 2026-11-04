@@ -4,10 +4,10 @@ test('discovery categories, pagination, selection and near arrival',async({page}
  await page.goto('/');await expect(page.locator('.catalog-status')).toContainText('10000 Gaia');
  await page.getByRole('button',{name:'Upptäck',exact:true}).click();const panel=page.getByRole('region',{name:'Upptäck stjärnor'});
  await expect(panel.locator('article')).toHaveCount(10);await panel.getByRole('button',{name:'Visa fler'}).click();await expect(panel.locator('nav')).toContainText('2 /');
- await panel.getByRole('combobox').selectOption('largest');await expect(panel).toContainText('Tillräckliga verifierade uppgifter saknas');
+ await panel.getByRole('combobox').selectOption('largest');await expect(panel.locator('article')).toHaveCount(3);await expect(panel.locator('article').first()).toContainText('Sirius A');
  await panel.getByRole('combobox').selectOption('planets');await expect(panel.locator('article')).toHaveCount(2);await expect(panel.locator('article').first()).toContainText('Proxima Centauri');await panel.locator('article').filter({hasText:'Proxima Centauri'}).getByRole('button',{name:'Visa',exact:true}).click();await expect(page.locator('.details h2')).toHaveText('Proxima Centauri');
  await page.getByRole('combobox',{name:'Restid'}).selectOption('10');await page.getByRole('button',{name:'Upptäck',exact:true}).click();await panel.getByRole('combobox').selectOption('planets');await panel.locator('article').filter({hasText:'Proxima Centauri'}).getByRole('button',{name:'Res dit',exact:false}).click();
- await expect(page.locator('.arrival-notice')).toBeVisible({timeout:20000});await expect(page.locator('.arrival-notice')).toContainText('Illustrativ');
+ await expect(page.locator('.arrival-notice')).toBeVisible({timeout:20000});await expect(page.locator('.arrival-notice')).toContainText('Framme vid Proxima Centauri');
  await page.screenshot({path:'work/arrival-05.png'});
  await page.getByRole('button',{name:'Rikta mot destination',exact:true}).click();await page.waitForTimeout(1700);
  const pose=await page.evaluate(async()=>{const p='/src/navigation/diagnostics.ts';return (await import(p)).cameraDiagnostics.position;});

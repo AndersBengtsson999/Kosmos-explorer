@@ -1,3 +1,4 @@
+import {usePlanetStore} from '../planets/state';
 import {NearStars} from './NearStar';
 import {StarCloud} from './StarCloud';
 import {Canvas} from '@react-three/fiber';
@@ -23,4 +24,4 @@ function Scene(){const showScale=useStore(s=>s.showScale),showAxes=useStore(s=>s
  <StarCloud/><NearStars/></>;
 }
 const initialCamera = {position:[24,16,30] as [number,number,number],fov:55,near:1e-11,far:100000};
-export const Universe=memo(function Universe(){return <Boundary><Canvas camera={initialCamera} dpr={[1,1.75]} fallback={<div className="fallback">WebGL saknas. Katalogen kan fortfarande utforskas via sökningen.</div>}><Scene/></Canvas></Boundary>;});
+export const Universe=memo(function Universe(){const local=usePlanetStore(s=>s.host!==null);return <Boundary><Canvas frameloop={local?'demand':'always'} camera={initialCamera} dpr={[1,1.75]} fallback={<div className="fallback">WebGL saknas. Katalogen kan fortfarande utforskas via sökningen.</div>}><Scene/></Canvas></Boundary>;});

@@ -1,0 +1,26 @@
+{
+  "sun": {
+    "radiusSolar": 1,
+    "temperature": 5772,
+    "source": "IAU 2015 B3, nominella solvärden",
+    "url": "https://arxiv.org/abs/1510.07674"
+  },
+  "HIP 32349": {
+    "radiusSolar": 1.713,
+    "temperature": 9845,
+    "source": "Davis et al. 2011, interferometri + Hipparcos; radie ±0,009 solradier",
+    "url": "https://doi.org/10.1071/AS10010"
+  },
+  "Gaia DR3 5853498713190525696": {
+    "radiusSolar": 0.141,
+    "temperature": 2900.0,
+    "source": "NASA Exoplanet Archive, källbelagd modellskattning",
+    "url": "https://ui.adsabs.harvard.edu/abs/2025A&A...700A..11M/abstract"
+  },
+  "Gaia DR3 2635476908753563008": {
+    "radiusSolar": 0.1192,
+    "temperature": 2566.0,
+    "source": "NASA Exoplanet Archive, källbelagd modellskattning",
+    "url": "https://ui.adsabs.harvard.edu/abs/2021PSJ.....2....1A/abstract"
+  }
+}

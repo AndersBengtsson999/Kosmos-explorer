@@ -12,7 +12,7 @@ export function JourneyPanel(){
   <progress aria-label="Resans förlopp" max="100" value={percent}/>
   <dl className="journey-distances"><div><dt>Kvar till ankomstpunkten</dt><dd>{formatDistance(arrived?0:s.journey.remaining)}</dd></div><div><dt>Till stjärnans centrum</dt><dd>{formatDistance(distance(destination.position,s.position))}</dd></div></dl>
   <p className="journey-help">Ankomstpunkten ligger utanför stjärnans yta. Centrum ligger längre in.</p>
-  {!radiusInfo(destination).known&&<small>Illustrativ radie: 1 solradie · verklig radie saknas.</small>}
+  {!radiusInfo(destination).known&&<small>{radiusInfo(destination).source} · {radiusInfo(destination).solar.toLocaleString('sv-SE')} solradier.</small>}
   <div className="journey-actions">{!arrived&&<><button onClick={s.togglePause}>{s.journey.paused?'Återuppta':'Pausa'}</button><button onClick={s.cancelTravel}>Avbryt resa</button></>}<button onClick={s.aim}>Rikta mot destination</button>{arrived&&<button aria-label="Stäng ankomstmeddelande" onClick={()=>useStore.setState({journey:{...s.journey,arrived:false}})}>Stäng</button>}</div>
  </section>;
 }

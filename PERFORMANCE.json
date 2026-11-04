@@ -157,5 +157,38 @@
         "nearest": "Gaia DR3 1838855376946302720"
       }
     ]
+  },
+  "freeFlight07": {
+    "environment": "Headless Chrome, SwiftShader, 1280x720, DPR 1, static initial view; frame intervals, not GPU timestamps; JS heap after GC; CPU nearest search",
+    "reports": [
+      {
+        "count": 10000,
+        "totalStars": 10007,
+        "samples": 76,
+        "medianFrameMs": 61.799999952316284,
+        "p95FrameMs": 89.19999992847443,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 40879138,
+        "pointAttributeBytes": 320256,
+        "nearestSearchMs": 5.5,
+        "repeatedSearchMs": 0.19999992847442627,
+        "nearest": "Gaia DR3 1838855376946302720"
+      },
+      {
+        "count": 100000,
+        "totalStars": 100007,
+        "samples": 37,
+        "medianFrameMs": 97.39999997615814,
+        "p95FrameMs": 257.5,
+        "drawCalls": 2,
+        "geometries": 2,
+        "jsHeapBytes": 91428096,
+        "pointAttributeBytes": 3200256,
+        "nearestSearchMs": 169.19999992847443,
+        "repeatedSearchMs": 2.3000000715255737,
+        "nearest": "Gaia DR3 1838855376946302720"
+      }
+    ]
   }
 }

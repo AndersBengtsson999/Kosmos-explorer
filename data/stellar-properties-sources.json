@@ -1,0 +1,6 @@
+{
+  "dwarfSequenceUrl": "https://www.pas.rochester.edu/~emamajek/EEM_dwarf_UBVIJHK_colors_Teff.txt",
+  "dwarfVersion": "2022.04.16",
+  "dwarfSha256": "1de2edeec17bb3346e0e4e70b999de5ee29947df38474e64cddb7cfacc164b7f",
+  "note": "Dwarf values are class means, not measurements of individual stars. Only exact supplied dwarf spectral classes use these estimates. Sirius radius 1.713 +/- 0.009 Rsun and Teff 9845 +/- 64 K; source DOI 10.1071/AS10010. Other properties use existing NASA snapshots, or IAU nominal Sun."
+}

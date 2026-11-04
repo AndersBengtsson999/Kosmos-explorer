@@ -1,3 +1,19 @@
+# Cosmos Explorer 0.7 – fri flygning, 2026-11-04
+
+113/113 enhetstester i 11 filer och 13/13 webbläsarscenarier passerar. Den slutliga Chrome/SwiftShader-omgången tog 2,7 minuter. TypeScript/Vite-produktionsbygget passerar; kvarvarande storleksvarning gäller huvudfilen på 1 267 kB (359 kB gzip).
+
+Fri flygning har verifierats för utforskningens automatiska stopp, simuleringens acceleration/tröghet och separata broms, musblick, sidled/uppåt/nedåt och återgång till OrbitControls med bibehållen kameraposition och orientering. Ett initialt test upptäckte långsam resthastighet vid automatisk inbromsning; bromsen når nu exakt noll utan riktningsbyte. Den kompletta omkörningen passerar. Solens närbild har granskats visuellt.
+
+Storlekstester omfattar Solen, Sirius A och TRAPPIST-1, samma radie i AU och ljusår, ökande vinkelstorlek vid närmande, större radies större vinkelstorlek, mjuk punkt–sfärövergång och ankomst utanför ytan. Kontinuerlig segmentkontroll stoppar även snabba passager genom en kropp vid 1,02 gånger dess radie. Befintliga stjärnresor, paus, fri blick, Sirius-sökning, TRAPPIST-system, planetresor, mobilpaneler och 10k/100k-kataloger passerar.
+
+Gemensam stjärnrendering och radiekälla används av kartan och planetsystemen. Källor: IAU:s nominella solradie, Davis et al. 2011 för Sirius A (1,713 solradier), befintligt NASA Exoplanet Archive-underlag för Proxima/TRAPPIST-1 samt Mamajeks tabell för 87 klassbaserade dvärgradieuppskattningar. Uppskattningar märks och saknat klassunderlag ger fortsatt en uttryckligt illustrativ reservradie. Reproducerbar import och källor dokumenteras i README.
+
+Begränsningar: flygstyrningen kräver tangentbord och mus. Planetrörelser pausas under fri flygning. Utforskning är ett resehjälpmedel som kan överskrida ljushastigheten; simulering är Newtonsk utan gravitation eller relativitet. Glöd, ytstruktur och färgåtergivning är illustrativa. Den dolda stjärnkartan pausas under lokal rendering.
+
+Senaste prestandakontroll med mjukvarurendering: 10k median 61,8 ms/P95 89,2 ms, JS-heap 40,9 MB; 100k median 97,4 ms/P95 257,5 ms, JS-heap 91,4 MB. Två draw calls i båda fallen. Detta är bildruteintervall under testkörningen, inte GPU-tid eller ett mått på fri flygning. Resultaten är långsammare än tidigare körningar och visar att 100k-läget inte håller jämn bildfrekvens i denna miljö; orsaken har inte isolerats. Rådata finns under freeFlight07 i PERFORMANCE.json.
+
+---
+
 # Cosmos Explorer 0.6.1 – planetsystemens värdstjärnor, 2026-11-04
 
 98/98 enhetstester, 12/12 webbläsarscenarier (Chrome/SwiftShader, 3,3 minuter) och TypeScript/Vite-produktionsbygget passerar. TRAPPIST-1 e har följts hela vägen genom ordinarie stjärnsökning, stjärnresa, systemval och planetresa; närbilden är visuellt granskad. Planetbild och banfas är tydligt illustrativa.

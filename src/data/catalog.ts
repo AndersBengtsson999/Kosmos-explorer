@@ -3,7 +3,7 @@ import knownRaw from './known-stars.json';
 import {normalizeName} from './identity';
 import raw from './stars.json';
 import {position,type Vec3} from '../math/coordinates';
-export interface Star {aliases?:string[];sourceUrl?:string;componentNote?:string;radiusSolar?:number|null;radiusSource?:string;temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
+export interface Star {spectralClass?:string;aliases?:string[];sourceUrl?:string;componentNote?:string;radiusSolar?:number|null;radiusSource?:string;temperature?:number|null;id:string;name:string;ra:number;dec:number;parallax:number;parallaxError:number|null;mag:number|null;bpRp:number|null;epoch:number;source:string;position:Vec3}
 export function parseCatalog(input:unknown):Star[]{
  if(!Array.isArray(input)||input.length===0||input.length>100000)throw new Error('Katalogen måste innehålla 1–100000 stjärnor.');
  const ids=new Set<string>();
@@ -18,7 +18,7 @@ export function parseCatalog(input:unknown):Star[]{
   if(s.temperature!==undefined&&s.temperature!==null&&(typeof s.temperature!=='number'||!Number.isFinite(s.temperature)||s.temperature<=0))throw new Error('Ogiltig temperatur');
   if(s.radiusSolar!=null&&(typeof s.radiusSolar!=='number'||!Number.isFinite(s.radiusSolar)||s.radiusSolar<=0||typeof s.radiusSource!=='string'||!s.radiusSource.trim()))throw new Error('Radie kräver positivt värde och källa');
   if(s.aliases!==undefined&&(!Array.isArray(s.aliases)||s.aliases.length>200||!s.aliases.every(a=>typeof a==='string'&&a.trim()&&a.length<=160)))throw new Error('Alias måste vara en lista med högst 200 namn.');
-  for(const key of ['sourceUrl','componentNote'])if(s[key]!==undefined&&typeof s[key]!=='string')throw new Error('Ogiltig källinformation');
+  for(const key of ['sourceUrl','componentNote','spectralClass'])if(s[key]!==undefined&&typeof s[key]!=='string')throw new Error('Ogiltig källinformation');
   if(s.sourceUrl!==undefined&&!/^https?:\/\//i.test(s.sourceUrl as string))throw new Error('Källänk måste vara http eller https');
   ids.add(s.id);const star=s as unknown as Star;return {...star,position:position(star.ra,star.dec,star.parallax)};
  });
